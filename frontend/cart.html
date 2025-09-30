@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кошик</title>
+ <style>
+    /* Основна палітра: #e3f2fd (Дуже світло-блакитний), #2196f3 (Середньо-блакитний), #0d47a1 (Темно-синій) */
+    body { 
+        font-family: sans-serif; 
+        margin: 0; 
+        background-color: #e3f2fd; /* Дуже світло-блакитний фон */
+        color: #333;
+    }
+    header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        background-color: #bbdefb; /* Світло-блакитний фон шапки */
+        padding: 15px 40px; 
+        margin-bottom: 30px;
+    }
+    .cart-link { 
+        font-size: 1.2em; 
+        text-decoration: none; 
+        color: #0d47a1; /* Темно-синій колір посилання */
+        font-weight: bold;
+    }
+    h1, h2 { color: #0d47a1; } /* Темно-сині заголовки */
+    
+    .product-list { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 30px; 
+        padding: 0 40px;
+    }
+    .product-card { 
+        border: 1px solid #bbdefb; /* Світло-блакитна рамка */
+        background-color: white;
+        padding: 20px; 
+        width: 250px; 
+        text-align: center; 
+        box-shadow: 5px 5px 10px rgba(13, 71, 161, 0.2); /* Синя тінь */
+        border-radius: 10px;
+    }
+    .product-image { 
+        max-width: 100%; 
+        height: auto; 
+        margin-bottom: 15px; 
+        border-radius: 5px;
+    }
+    .add-to-cart-btn { 
+        background-color: #2196f3; /* Середньо-блакитна кнопка */
+        color: white; 
+        padding: 10px 15px; 
+        border: none; 
+        cursor: pointer; 
+        border-radius: 5px; 
+        margin-top: 10px;
+        transition: background-color 0.3s;
+    }
+    .add-to-cart-btn:hover {
+        background-color: #0d47a1;
+    }
+    
+    /* Стилі для cart.html */
+    .cart-item { 
+        background-color: #fff;
+        padding: 15px; 
+        border: 1px solid #bbdefb;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .cart-total { 
+        color: #2196f3;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <h1>Ваш Кошик</h1>
+        <p><a href="index.html">← Повернутися до магазину</a></p>
+    </header>
+
+    <div id="cart-items">
+        </div>
+
+    <div class="cart-total">
+        Загальна сума: <span id="cart-total">0</span> грн
+    </div>
+
+    <button style="background-color: #007bff; color: white; padding: 10px 15px; border: none; margin-top: 20px; cursor: pointer;">Оформити замовлення</button>
+
+    <script type="module" src="frontend/js/cart.js"></script>
+    
+    <script type="module">
+        import { renderCartItems } from './frontend/js/cart.js';
+        document.addEventListener('DOMContentLoaded', renderCartItems);
+    </script>
+</body>
+</html>

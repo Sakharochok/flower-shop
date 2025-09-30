@@ -37,6 +37,12 @@ export class Cart {
     getTotalPrice() {
         return this.#items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }
+        // Нетривіальний метод
+    // Видаляє товар повністю з кошика
+    removeItem(productId) {
+        this.#items = this.#items.filter(item => item.id !== productId);
+        this.saveCart();
+    }
 }
 
 // Створюємо єдиний екземпляр кошика
@@ -61,7 +67,7 @@ export function renderCartItems() {
     if (!cartItemsContainer || !cartTotalElement) return;
 
     cartItemsContainer.innerHTML = '';
-    const items = cartInstance.getItems(); // отримуємо доступ до приватного масиву через метод
+    const items = cartInstance.getItems();
 
     if (items.length === 0) {
         cartItemsContainer.innerHTML = '<p>Кошик порожній.</p>';
@@ -72,10 +78,24 @@ export function renderCartItems() {
             itemElement.innerHTML = `
                 <span>${item.name} x ${item.quantity}</span>
                 <span>${item.price * item.quantity} грн</span>
+                <button class="remove-item-btn" data-id="${item.id}">Видалити</button>
             `;
             cartItemsContainer.appendChild(itemElement);
         });
+
+        // Додаємо обробники подій для кнопок "Видалити"
+        document.querySelectorAll('.remove-item-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const productId = parseInt(e.target.dataset.id);
+                // Викликаємо новий метод класу Cart
+                cartInstance.removeItem(productId);
+                // Оновлюємо відображення
+                renderCartItems();
+                updateCartCount();
+            });
+        });
     }
+
     cartTotalElement.textContent = cartInstance.getTotalPrice();
 }
 
