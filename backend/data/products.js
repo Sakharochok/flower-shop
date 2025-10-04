@@ -115,6 +115,24 @@ export class Bouquet extends ShopItem {
     // ... (getDescription method remains the same)
 }
 
+export class DecorItem extends ShopItem {
+    #material;
+    
+    constructor(id, name, price, image, material) {
+        super(id, name, price, image);
+        this.#material = material;
+    }
+
+    // Non-trivial method: Checks for eco-friendliness
+    isEcoFriendly() {
+        return this.#material === 'wood' || this.#material === 'paper';
+    }
+    
+    // Polymorphic method: description for decor
+    getDescription() {
+        return `This decorative element is made of ${this.#material}.`;
+    }
+}
 // --- Container class for Static Polymorphism (Generics) ---
 export class Store {
     #items;
