@@ -1,4 +1,4 @@
-// Клас для представлення кошика
+// Class to represent the shopping cart
 export class Cart {
     #items;
     constructor() {
@@ -8,14 +8,14 @@ export class Cart {
         return this.#items;
     }
 
-    // Нетривіальний метод
-    // Зберігає вміст кошика в LocalStorage
+    // Non-trivial method
+    // Saves the cart contents to LocalStorage
     saveCart() {
         localStorage.setItem('cart', JSON.stringify(this.#items));
     }
 
-    // Нетривіальний метод
-    // Додає товар до кошика
+    // Non-trivial method
+    // Adds a product to the cart
     addItem(product) {
         const existingItem = this.#items.find(item => item.id === product.getId());
         if (existingItem) {
@@ -26,26 +26,26 @@ export class Cart {
         this.saveCart();
     }
 
-    // Нетривіальний метод
-    // Розраховує загальну кількість товарів у кошику
+    // Non-trivial method
+    // Calculates the total number of items in the cart
     getTotalItemsCount() {
         return this.#items.reduce((sum, item) => sum + item.quantity, 0);
     }
 
-    // Нетривіальний метод
-    // Розраховує загальну суму кошика
+    // Non-trivial method
+    // Calculates the total price of the cart
     getTotalPrice() {
         return this.#items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }
-        // Нетривіальний метод
-    // Видаляє товар повністю з кошика
+        // Non-trivial method
+    // Removes an item completely from the cart
     removeItem(productId) {
         this.#items = this.#items.filter(item => item.id !== productId);
         this.saveCart();
     }
 }
 
-// Створюємо єдиний екземпляр кошика
+// Creates a single cart instance
 const cartInstance = new Cart();
 const cartCountElement = document.getElementById('cart-count');
 
@@ -58,7 +58,7 @@ export function updateCartCount() {
 export function addToCart(product) {
     cartInstance.addItem(product);
     updateCartCount();
-    alert(`Товар "${product.getName()}" додано до кошика!`);
+    alert(`Item "${product.getName()}" added to cart!`);
 }
 
 export function renderCartItems() {
@@ -70,11 +70,12 @@ export function renderCartItems() {
     const items = cartInstance.getItems();
 
     if (items.length === 0) {
-        cartItemsContainer.innerHTML = '<p>Кошик порожній.</p>';
+        cartItemsContainer.innerHTML = '<p>The cart is empty.</p>';
     } else {
         items.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'cart-item';
+            // Note: Keeping "грн" and "Видалити" in Ukrainian for UI consistency
             itemElement.innerHTML = `
                 <span>${item.name} x ${item.quantity}</span>
                 <span>${item.price * item.quantity} грн</span>
@@ -83,13 +84,13 @@ export function renderCartItems() {
             cartItemsContainer.appendChild(itemElement);
         });
 
-        // Додаємо обробники подій для кнопок "Видалити"
+        // Adds event handlers for the "Remove" buttons
         document.querySelectorAll('.remove-item-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 const productId = parseInt(e.target.dataset.id);
-                // Викликаємо новий метод класу Cart
+                // Calls the new Cart class method
                 cartInstance.removeItem(productId);
-                // Оновлюємо відображення
+                // Updates the display
                 renderCartItems();
                 updateCartCount();
             });

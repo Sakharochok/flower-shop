@@ -8,12 +8,12 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// --- Маршрут для отримання всіх товарів ---
+// --- Route for retrieving all products ---
 app.get('/products', (req, res) => {
     res.json(products);
 });
 
-// --- Маршрут для оформлення замовлення ---
+// --- Route for placing an order ---
 app.post('/order', (req, res) => {
     const order = req.body;
     if (!order || !order.items || order.items.length === 0) {
