@@ -1,6 +1,6 @@
 
-import { ShopItem } from './shopItem.js';
-import { Graph } from '../utils/graph.js'; // Requires graph class
+import { ShopItem } from './ShopItem.js';
+import { Graph } from '../../utils/graph.js'; // Requires graph class
 
 export class Bouquet extends ShopItem {
     #flowers;

@@ -1,5 +1,5 @@
 
-import { ShopItem } from './shopItem.js';
+import { ShopItem } from './ShopItem.js';
 
 export class Flower extends ShopItem {
     #color;

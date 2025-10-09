@@ -1,7 +1,7 @@
 // frontend/js/main.js
 
 // Imports the product array and the Flower class, as its logic is needed
-import { products, Flower } from '../../backend/data/products.js';
+import { products, Flower } from '../../backend/data/products/products.js';
 import { updateCartCount, addToCart } from './cart.js';
 
 const productListContainer = document.getElementById('product-list');

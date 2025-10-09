@@ -2,7 +2,7 @@
 // This module defines the Store container class, demonstrating Static Polymorphism (Generics).
 
 // Import the base class to ensure type checking in addItem method
-import { ShopItem } from './shopItem.js'; 
+import { ShopItem } from './ShopItem.js'; 
 
 // --- Container class for Static Polymorphism (Generics) ---
 export class Store {

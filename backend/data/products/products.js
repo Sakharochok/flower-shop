@@ -1,6 +1,6 @@
 
-import { ShopItem } from './shopItem.js';
-import { Flower } from './flower.js';
+import { ShopItem } from './ShopItem.js';
+import { Flower } from './Flower.js';
 import { Bouquet } from './bouquet.js';
 import { DecorItem } from './decorItem.js';
 import { Store } from './Store.js'; 
