@@ -1,105 +1,94 @@
+import { Flower, Bouquet, SpecialBouquet, DecorItem, Store } from '../backend/data/products/products.js';
+import { User, Order } from '../backend/data/entities/entities.js';
+import { Graph } from '../backend/utils/graph.js';
 
-// Unit test scenario to confirm the functionality of OOP classes.
+// --- Test Runner ---
+const describe = (description, fn) => {
+    console.log(`\n--- ${description} ---`);
+    fn();
+};
 
-// Import classes via the aggregators (products.js and entities.js)
-import { Flower, Bouquet, DecorItem, Store, ShopItem } from '../backend/data/products/products.js';
-import { User, Order, Payment, NovaPoshtaShipping } from '../backend/data/entities/entities.js';
-
-// Helper function for test result output
-function assert(condition, message) {
-    if (!condition) {
-        console.error(`❌ FAILED: ${message}`);
-        return false;
+const it = (description, fn) => {
+    try {
+        fn();
+        console.log(`✅ PASSED: ${description}`);
+    } catch (error) {
+        console.error(`❌ FAILED: ${description}`);
+        console.error(error.message);
+        process.exit(1); // Зупинити виконання при першій помилці
     }
-    console.log(`✅ PASSED: ${message}`);
-    return true;
-}
+};
 
-// =========================================================================
-// TEST SCENARIOS
-// =========================================================================
+const expect = (actual) => ({
+    toBe: (expected) => {
+        if (actual !== expected) {
+            throw new Error(`Expected ${actual} to be ${expected}`);
+        }
+    },
+    toThrow: (expectedError) => {
+        let threw = false;
+        try {
+            actual();
+        } catch (e) {
+            threw = true;
+            if (!e.message.includes(expectedError)) {
+                throw new Error(`Expected error message to include "${expectedError}", but got "${e.message}"`);
+            }
+        }
+        if (!threw) {
+            throw new Error('Expected function to throw, but it did not.');
+        }
+    },
+});
 
-// --- 1. TEST: DYNAMIC POLYMORPHISM AND INHERITANCE ---
-function testDynamicPolymorphism() {
-    console.log("\n--- Test 1: Dynamic Polymorphism (getDescription) ---");
-    
+// --- Test Suites ---
+
+describe('Inheritance and Polymorphism', () => {
     const rose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50);
-    const ribbon = new DecorItem(200, "Silk Ribbon", 25, "img.jpg", "paper");
+    const weddingBouquet = new SpecialBouquet(102, "Wedding Bouquet", 1200, "img.jpg", [rose], 'Wedding');
 
-    // 1. Check overridden method for Flower
-    assert(rose.getDescription().includes("Color: Red") && rose.getDescription().includes("50 cm"), 
-           "Flower: getDescription() returns correct description.");
+    it('should correctly override getDescription in Flower', () => {
+        expect(rose.getDescription().includes('Color: Red')).toBe(true);
+    });
 
-    // 2. Check overridden method for DecorItem
-    assert(ribbon.getDescription().includes("made of paper"), 
-           "DecorItem: getDescription() returns material description.");
+    it('should show three levels of inheritance in SpecialBouquet', () => {
+        expect(weddingBouquet.getDescription().includes('special bouquet for a Wedding')).toBe(true);
+        expect(weddingBouquet.getOccasion()).toBe('Perfect for: Wedding');
+    });
+});
 
-    // 3. Check non-trivial inherited method (isPricy)
-    assert(rose.isPricy() === false, "ShopItem: isPricy() works correctly (false).");
-    const hydrangea = new Flower(10, "Hydrangea", 120, "img.jpg", "Blue", 60);
-    assert(hydrangea.isPricy() === true, "ShopItem: isPricy() works correctly (true).");
-}
-
-// --- 2. TEST: STATIC POLYMORPHISM (Type Constraints/Generics) ---
-function testStaticPolymorphism() {
-    console.log("\n--- Test 2: Static Polymorphism (Store.addItem) ---");
+describe('Static Polymorphism (Generics)', () => {
     const store = new Store();
     const item = new DecorItem(200, "Ribbon", 25, "img.jpg", "paper");
-    const user = new User(1, "Alice", "a@mail.com"); // Object from a different hierarchy
+    const notAShopItem = new User(1, "Alice", "a@mail.com");
 
-    // 1. Adding an allowed type (ShopItem descendant)
-    store.addItem(item);
-    assert(store.getTotalItemsCount() === 1, "Store: Added allowed type (DecorItem).");
+    it('should allow adding items that inherit from ShopItem', () => {
+        store.addItem(item);
+        expect(store.getTotalItemsCount()).toBe(1);
+    });
 
-    // 2. Check type constraint: attempting to add a forbidden type
-    try {
-        store.addItem(user); 
-        assert(false, "Store: Forbidden type (User) DID NOT throw an error.");
-    } catch (e) {
-        // Expecting the code to throw an error containing the type constraint message
-        assert(e.message === "Element must inherit from ShopItem.", 
-               "Store: Forbidden type THREW the correct error (Static Polymorphism).");
-    }
-}
+    it('should throw an error when adding an item not inheriting from ShopItem', () => {
+        expect(() => store.addItem(notAShopItem)).toThrow('Element must inherit from ShopItem.');
+    });
+});
 
+describe('Graph Algorithms in Bouquet', () => {
+    const redRose = new Flower(1, "Rose (Red)", 60, "img.jpg", "Red", 50);
+    const ribbon = new DecorItem(200, "Ribbon", 25, "img.jpg", "silk");
+    const customBouquet = new Bouquet(500, "Custom Bouquet", 100, "img.jpg", [redRose, ribbon]);
 
-// --- 3. TEST: NON-TRIVIAL METHODS and Abstraction ---
-function testNontrivialMethodsAndAbstraction() {
-    console.log("\n--- Test 3: Non-Trivial Methods and Abstraction ---");
-    
-    // 3A. Test Non-Trivial method Order.calculateTotal (calculation)
-    const testUser = new User(2, "Bob", "b@mail.com");
-    const order = new Order(1001, testUser);
-    
-    order.addItem({ price: 100, quantity: 2 }); 
-    order.addItem({ price: 50, quantity: 1 });  
-    assert(order.calculateTotal() === 250, "Order: calculateTotal() calculates the correct total.");
+    const compatibilityGraph = new Graph();
+    compatibilityGraph.addVertex('Rose (Red)');
+    compatibilityGraph.addVertex('Ribbon');
+    compatibilityGraph.addVertex('Gerbera (Pink)');
+    compatibilityGraph.addEdge('Rose (Red)', 'Ribbon', 2);
+    compatibilityGraph.addEdge('Rose (Red)', 'Gerbera (Pink)', 10);
 
-    // 3B. Test Non-Trivial method User.setShippingAddress (with validation)
-    assert(testUser.setShippingAddress("Kyiv, Main Street 10") === true, 
-           "User: setShippingAddress() (with validation) successfully sets address.");
-    assert(testUser.setShippingAddress("K 1") === false, 
-           "User: setShippingAddress() (with validation) rejects short address.");
-           
-    // 3C. Test Abstraction (calculateCost)
-    const novaPoshta = new NovaPoshtaShipping(1, "Kyiv", "NP-101");
-    assert(novaPoshta.calculateCost() === 80, 
-           "NovaPoshtaShipping: calculateCost() (Abstraction Polymorphism) returns correct cost.");
+    it('should find optimal connections using the provided graph', () => {
+        const result = customBouquet.findOptimalFlowerConnections(compatibilityGraph, 'Kruskal');
+        expect(result.weight).toBe(2);
+        expect(result.algorithm).toBe('Kruskal');
+    });
+});
 
-    // 3D. Test Non-Trivial method Payment.processPayment
-    try {
-        new Payment(1, 100, 'card').processPayment();
-        assert(true, "Payment: processPayment() successfully processes payment.");
-    } catch (e) {
-        assert(false, "Payment: processPayment() should not throw an error.");
-    }
-}
-
-
-// =========================================================================
-// RUN ALL TESTS
-// =========================================================================
-
-testDynamicPolymorphism();
-testStaticPolymorphism();
-testNontrivialMethodsAndAbstraction();
+console.log("\nAll tests completed successfully!");

@@ -4,6 +4,7 @@ import { Flower } from './Flower.js';
 import { Bouquet } from './bouquet.js';
 import { DecorItem } from './decorItem.js';
 import { Store } from './Store.js'; 
+import { SpecialBouquet } from './SpecialBouquet.js';
 
 // =========================================================================
 // PRODUCTS ARRAY (Full list of products for display)
@@ -47,6 +48,8 @@ const products = [
     new DecorItem(200, "Silk Ribbon", 25, "/images/decor/ribbon_silk.jpg", "paper"),
     new DecorItem(201, "Vase (Small)", 150, "/images/decor/vase_small.jpg", "glass"), 
     new DecorItem(202, "Greeting Card", 15, "/images/decor/card.jpg", "paper"), 
+
+    new SpecialBouquet(102, "Wedding Bouquet", 1200, "/images/bouquets/bouquet_premium.jpg", [], 'Wedding'),
 ];
 
 
@@ -58,5 +61,6 @@ export {
     Flower, 
     Bouquet, 
     DecorItem, 
-    Store 
+    Store,
+    SpecialBouquet
 };

@@ -1,45 +1,55 @@
-
 import { ShopItem } from './ShopItem.js';
-import { Graph } from '../../utils/graph.js'; // Requires graph class
+import { Graph } from '../../utils/graph.js';
 
 export class Bouquet extends ShopItem {
     #flowers;
     #isCustom;
-    
+
     constructor(id, name, price, image, flowers) {
         super(id, name, price, image);
         this.#flowers = flowers;
         this.#isCustom = false;
     }
-    // Non-trivial methods (remain the same)
-    calculateBouquetPrice() {
-        const basePrice = this.getPrice();
-        const flowersPrice = this.#flowers.reduce((sum, flower) => sum + flower.getPrice(), 0);
-        return basePrice + flowersPrice;
-    }
+
     addFlower(flower) {
         this.#flowers.push(flower);
         this.#isCustom = true;
     }
-    // NEW NON-TRIVIAL METHOD (Graph logic remains the same)
+    
+    // Метод тепер коректно використовує переданий граф
     findOptimalFlowerConnections(graph, algorithmName = 'Kruskal') {
         const flowerNames = this.#flowers.map(f => f.getName());
-        const subGraph = new Graph();
-        for (const name of flowerNames) {
-            subGraph.addVertex(name);
-        }
-        // Simplified edge addition...
-        if (flowerNames.includes('Rose (Red)') && flowerNames.includes('Ribbon')) {
-            subGraph.addEdge('Rose (Red)', 'Ribbon', 2);
-        }
-        if (subGraph.getVertices().length < 2) {
+        
+        // Перевірка, чи достатньо вершин для побудови дерева
+        if (flowerNames.length < 2) {
             return { mst: [], weight: 0, algorithm: algorithmName };
         }
+
+        // Створення підграфу на основі квітів у букеті
+        const subGraph = new Graph();
+        for (const name of flowerNames) {
+            if (graph.getVertices().includes(name)) {
+                subGraph.addVertex(name);
+            }
+        }
         
-        let result = subGraph.kruskalMST(); // Default to Kruskal
+        for (const edge of graph.getEdges()) {
+            if (flowerNames.includes(edge.v1) && flowerNames.includes(edge.v2)) {
+                subGraph.addEdge(edge.v1, edge.v2, edge.weight);
+            }
+        }
+        
+        // Виклик алгоритму на підграфі
+        let result = subGraph.kruskalMST(); // За замовчуванням Kruskal
+        if (algorithmName === 'Prim' && subGraph.getVertices().length > 0) {
+           result = subGraph.primMST(subGraph.getVertices()[0]);
+        }
+        
         return { mst: result.mst, weight: result.weight, algorithm: algorithmName };
     }
+
     getDescription() {
-        return `Collection of ${this.#flowers.length} different flowers.`;
+        const flowerCount = this.#flowers.length;
+        return `A beautiful collection of ${flowerCount} flowers.`;
     }
 }

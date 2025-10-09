@@ -1,0 +1,14 @@
+{
+  "name": "flower-shop",
+  "version": "1.0.0",
+  "description": "Flower shop website project",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "doc:generate": "jsdoc -c jsdoc.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.2"
+  }
+}
+
