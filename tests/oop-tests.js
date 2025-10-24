@@ -1,5 +1,6 @@
-import { Flower, Bouquet, SpecialBouquet, DecorItem, Store } from '../backend/data/products/products.js';
-import { User, Order } from '../backend/data/entities/entities.js';
+// --- Imports ---
+import { Flower, Bouquet, SpecialBouquet, DecorItem, Store, ShopItem } from '../backend/data/products/products.js';
+import { User, Order, Payment, Shipping, NovaPoshtaShipping } from '../backend/data/entities/entities.js';
 import { Graph } from '../backend/utils/graph.js';
 
 // --- Test Runner ---
@@ -15,7 +16,7 @@ const it = (description, fn) => {
     } catch (error) {
         console.error(`❌ FAILED: ${description}`);
         console.error(error.message);
-        process.exit(1); // Зупинити виконання при першій помилці
+        process.exit(1); // Stop execution on first error
     }
 };
 
@@ -43,6 +44,7 @@ const expect = (actual) => ({
 
 // --- Test Suites ---
 
+// (User's Original Tests - Translated)
 describe('Inheritance and Polymorphism', () => {
     const rose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50);
     const weddingBouquet = new SpecialBouquet(102, "Wedding Bouquet", 1200, "img.jpg", [rose], 'Wedding');
@@ -57,7 +59,7 @@ describe('Inheritance and Polymorphism', () => {
     });
 });
 
-describe('Static Polymorphism (Generics)', () => {
+describe('Static Polymorphism (Generics) - Store', () => {
     const store = new Store();
     const item = new DecorItem(200, "Ribbon", 25, "img.jpg", "paper");
     const notAShopItem = new User(1, "Alice", "a@mail.com");
@@ -91,4 +93,33 @@ describe('Graph Algorithms in Bouquet', () => {
     });
 });
 
-console.log("\nAll tests completed successfully!");
+// (Added Tests - Translated)
+
+describe('Class: User', () => {
+
+    it('should correctly create a user and generate a welcome message', () => {
+        const user = new User(1, 'Sofiia', 'sofiia@example.com');
+
+        // Base functionality check
+        expect(user.getName()).toBe('Sofiia');
+        expect(user.getEmail()).toBe('sofiia@example.com');
+        expect(user.generateWelcomeMessage()).toBe('Welcome, Sofiia!');
+    });
+
+    it('should correctly set a valid shipping address', () => {
+        const user = new User(2, 'Test', 'test@example.com');
+        const result = user.setShippingAddress('Kyiv, Khreshchatyk St, 1');
+
+        expect(result).toBe(true);
+        expect(user.getShippingAddress()).toBe('Kyiv, Khreshchatyk St, 1');
+    });
+
+    it('should not set an address that is too short (boundary case)', () => {
+        // Boundary/exception case check
+        const user = new User(3, 'Test 2', 'test2@example.com');
+        const result = user.setShippingAddress('123'); // < 5 chars
+
+        expect(result).toBe(false);
+        expect(user.getShippingAddress()).toBe(null);
+    });
+});
