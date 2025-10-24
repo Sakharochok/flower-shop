@@ -4,7 +4,6 @@ import { User, Order, Payment, Shipping, NovaPoshtaShipping } from '../backend/d
 import { Graph } from '../backend/utils/graph.js';
 
 // --- Test Runner ---
-// ... (код describe, it, expect)
 const describe = (description, fn) => {
     console.log(`\n--- ${description} ---`);
     fn();
@@ -45,7 +44,7 @@ const expect = (actual) => ({
 
 // --- Test Suites ---
 
-// ... (код describe 'Inheritance', 'Store', 'Graph')
+// (User's Original Tests - Translated)
 describe('Inheritance and Polymorphism', () => {
     const rose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50);
     const weddingBouquet = new SpecialBouquet(102, "Wedding Bouquet", 1200, "img.jpg", [rose], 'Wedding');
@@ -94,9 +93,10 @@ describe('Graph Algorithms in Bouquet', () => {
     });
 });
 
-// ... (код describe 'User')
+// (Added Tests - Translated)
+
 describe('Class: User', () => {
-    // ... (tests for User)
+
     it('should correctly create a user and generate a welcome message', () => {
         const user = new User(1, 'Sofiia', 'sofiia@example.com');
 
@@ -124,9 +124,7 @@ describe('Class: User', () => {
     });
 });
 
-// ... (код describe 'Order', 'Payment')
 describe('Class: Order', () => {
-    // ... (tests for Order)
     let order;
     let user;
 
@@ -165,7 +163,7 @@ describe('Class: Order', () => {
 });
 
 describe('Class: Payment', () => {
-    // ... (tests for Payment)
+
     it('should correctly process a payment', () => {
         const payment = new Payment(201, 150, 'card');
 
@@ -196,7 +194,6 @@ describe('Class: Payment', () => {
     });
 });
 
-// <<< НОВИЙ КОД ДЛЯ ЦЬОГО КРОКУ >>>
 describe('Abstract Class: Shipping', () => {
 
     it('should not allow instantiation of the abstract Shipping class (exception case)', () => {
@@ -236,3 +233,52 @@ describe('Class: Flower', () => {
         expect(boundaryRose.isSuitableForTallVase()).toBe(true);
     });
 });
+
+// <<< НОВИЙ КОД ДЛЯ ЦЬОГО КРОКУ >>>
+describe('Class: ShopItem (Base Class)', () => {
+
+    it('should return the base description', () => {
+        const item = new ShopItem(1, 'Item', 10, 'img.jpg');
+        expect(item.getDescription()).toBe('General shop item.');
+    });
+
+    it('should correctly identify a pricy item (isPricy)', () => {
+        const pricyItem = new ShopItem(2, 'Pricy', 150, 'img.jpg'); // > 100
+        expect(pricyItem.isPricy()).toBe(true);
+    });
+
+    it('should not consider an item pricy at the boundary (boundary case)', () => {
+        const boundaryItem = new ShopItem(3, 'Boundary', 100, 'img.jpg'); // == 100
+        const cheapItem = new ShopItem(4, 'Cheap', 99, 'img.jpg'); // < 100
+
+        expect(boundaryItem.isPricy()).toBe(false);
+        expect(cheapItem.isPricy()).toBe(false);
+    });
+});
+
+describe('Class: DecorItem & Bouquet (Subclasses)', () => {
+
+    it('DecorItem: should return description with material (Polymorphism)', () => {
+        const ribbon = new DecorItem(200, "Silk Ribbon", 25, "img.jpg", "silk");
+        expect(ribbon.getDescription()).toBe('This decorative element is made of silk.');
+    });
+
+    it('Bouquet: should correctly add a flower (addFlower)', () => {
+        const rose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50);
+        const bouquet = new Bouquet(100, "Test Bouquet", 150, "img.jpg", []);
+
+        bouquet.addFlower(rose);
+        // Check if the description updated
+        expect(bouquet.getDescription()).toBe('A beautiful collection of 1 flowers.');
+    });
+
+    it('SpecialBouquet: should inherit the isPricy method (Inheritance)', () => {
+        const weddingBouquet = new SpecialBouquet(102, "Wedding Bouquet", 1200, "img.jpg", [], 'Wedding');
+
+        // isPricy() is defined in ShopItem, but should work here
+        expect(weddingBouquet.isPricy()).toBe(true);
+    });
+});
+
+
+console.log("\nAll tests completed successfully!");
