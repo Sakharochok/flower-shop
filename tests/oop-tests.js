@@ -1,11 +1,10 @@
 // --- Imports ---
-// ... (всі імпорти, як і раніше) ...
 import { Flower, Bouquet, SpecialBouquet, DecorItem, Store, ShopItem } from '../backend/data/products/products.js';
 import { User, Order, Payment, Shipping, NovaPoshtaShipping } from '../backend/data/entities/entities.js';
 import { Graph } from '../backend/utils/graph.js';
 
 // --- Test Runner ---
-// ... (код describe, it, expect, як і раніше) ...
+// ... (код describe, it, expect)
 const describe = (description, fn) => {
     console.log(`\n--- ${description} ---`);
     fn();
@@ -46,8 +45,7 @@ const expect = (actual) => ({
 
 // --- Test Suites ---
 
-// (User's Original Tests - Translated)
-// ... (код describe 'Inheritance', 'Store', 'Graph', як і раніше) ...
+// ... (код describe 'Inheritance', 'Store', 'Graph')
 describe('Inheritance and Polymorphism', () => {
     const rose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50);
     const weddingBouquet = new SpecialBouquet(102, "Wedding Bouquet", 1200, "img.jpg", [rose], 'Wedding');
@@ -96,10 +94,9 @@ describe('Graph Algorithms in Bouquet', () => {
     });
 });
 
-// (Added Tests - Translated)
-
+// ... (код describe 'User')
 describe('Class: User', () => {
-    // ... (код describe 'User', як і раніше) ...
+    // ... (tests for User)
     it('should correctly create a user and generate a welcome message', () => {
         const user = new User(1, 'Sofiia', 'sofiia@example.com');
 
@@ -127,8 +124,9 @@ describe('Class: User', () => {
     });
 });
 
-// <<< НОВИЙ КОД ДЛЯ ЦЬОГО КРОКУ >>>
+// ... (код describe 'Order', 'Payment')
 describe('Class: Order', () => {
+    // ... (tests for Order)
     let order;
     let user;
 
@@ -167,7 +165,7 @@ describe('Class: Order', () => {
 });
 
 describe('Class: Payment', () => {
-
+    // ... (tests for Payment)
     it('should correctly process a payment', () => {
         const payment = new Payment(201, 150, 'card');
 
@@ -195,5 +193,46 @@ describe('Class: Payment', () => {
 
         expect(cardPayment.isCardPayment()).toBe(true);
         expect(cashPayment.isCardPayment()).toBe(false);
+    });
+});
+
+// <<< НОВИЙ КОД ДЛЯ ЦЬОГО КРОКУ >>>
+describe('Abstract Class: Shipping', () => {
+
+    it('should not allow instantiation of the abstract Shipping class (exception case)', () => {
+        // Exception case check
+        expect(() => new Shipping(1, 'Address')).toThrow('Abstract class Shipping cannot be instantiated directly.');
+    });
+
+    it('should force child classes to implement calculateCost', () => {
+        // Create a "bad" child class without implementation
+        class BadShipping extends Shipping {}
+        const badShip = new BadShipping(2, 'Address');
+
+        expect(() => badShip.calculateCost()).toThrow('Method calculateCost() must be implemented');
+    });
+
+    it('should correctly calculate cost in a child class (Polymorphism)', () => {
+        const npShipping = new NovaPoshtaShipping(10, 'Lviv', 5);
+
+        // NovaPoshtaShipping has its own implementation of calculateCost
+        expect(npShipping.calculateCost()).toBe(80);
+    });
+});
+
+describe('Class: Flower', () => {
+
+    it('should correctly determine if suitable for a tall vase (isSuitableForTallVase)', () => {
+        const tallRose = new Flower(1, "Rose", 60, "img.jpg", "Red", 50); // >= 40
+        const shortRose = new Flower(2, "Rose", 60, "img.jpg", "Red", 39); // < 40
+
+        expect(tallRose.isSuitableForTallVase()).toBe(true);
+        expect(shortRose.isSuitableForTallVase()).toBe(false);
+    });
+
+    it('should work correctly on the boundary (boundary case)', () => {
+        // Boundary case check
+        const boundaryRose = new Flower(3, "Rose", 60, "img.jpg", "Red", 40); // == 40
+        expect(boundaryRose.isSuitableForTallVase()).toBe(true);
     });
 });
