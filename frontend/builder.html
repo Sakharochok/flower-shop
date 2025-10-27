@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор Букетів</title>
+<style>
+    /* ... (all existing styles) ... */
+</style>
+</head>
+<body>
+    <header>
+        <h1>Квітковий Магазин</h1>
+        <div class="header-nav">
+            <a href="index.html" class="cart-link">Головна</a>
+            
+            <a href="cart.html" class="cart-link">
+                Кошик (<span id="cart-count">0</span>)
+            </a>
+        </div>
+    </header>
+
+    <div class="builder-container">
+        
+        <div class="builder-column">
+            <h2>Доступні Компоненти</h2>
+            <div id="available-items-list" class="item-list">
+                <p>Завантаження компонентів...</p>
+            </div>
+        </div>
+
+        <div class="builder-column">
+            <h2>Ваш Букет</h2>
+            <div id="bouquet-items-list" class="item-list">
+                <p id="bouquet-placeholder">Натисніть на компонент, щоб додати його.</p>
+            </div>
+            
+            <div class="builder-result">
+                <button id="calculate-btn" class="calculate-btn" disabled>Розрахувати Вартість Збірки</button>
+                <div id="result-display">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/builder.js"></script>
+</body>
+</html>
