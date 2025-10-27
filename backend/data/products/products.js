@@ -1,8 +1,11 @@
+// backend/data/products/products.js
 
 import { ShopItem } from './ShopItem.js';
 import { Flower } from './Flower.js';
-import { Bouquet } from './bouquet.js';
-import { DecorItem } from './decorItem.js';
+// Corrected case: 'Bouquet.js'
+import { Bouquet } from './Bouquet.js';
+// Corrected case: 'DecorItem.js'
+import { DecorItem } from './DecorItem.js';
 import { Store } from './Store.js'; 
 import { SpecialBouquet } from './SpecialBouquet.js';
 
@@ -45,11 +48,11 @@ const products = [
     // --- 7. Bouquets and Decor ---
     new Bouquet(100, "Bouquet 'Tenderness'", 350, "/images/bouquets/bouquet_tenderness.jpg", []), 
     new Bouquet(101, "Bouquet 'Premium'", 500, "/images/bouquets/bouquet_premium.jpg", []), 
+    // This is the new item you added - it's correct
+    new SpecialBouquet(102, "Wedding Bouquet", 1200, "/images/bouquets/bouquet_premium.jpg", [], 'Wedding'),
     new DecorItem(200, "Silk Ribbon", 25, "/images/decor/ribbon_silk.jpg", "paper"),
     new DecorItem(201, "Vase (Small)", 150, "/images/decor/vase_small.jpg", "glass"), 
     new DecorItem(202, "Greeting Card", 15, "/images/decor/card.jpg", "paper"), 
-
-    new SpecialBouquet(102, "Wedding Bouquet", 1200, "/images/bouquets/bouquet_premium.jpg", [], 'Wedding'),
 ];
 
 
@@ -62,5 +65,5 @@ export {
     Bouquet, 
     DecorItem, 
     Store,
-    SpecialBouquet
+    SpecialBouquet 
 };
