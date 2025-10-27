@@ -6,59 +6,93 @@ import { updateCartCount } from './cart.js';
 const cart = new Cart();
 
 function initializeCheckout() {
+    // Update the header cart count
     updateCartCount();
     const summaryTotalEl = document.getElementById('summary-total');
     const checkoutForm = document.getElementById('checkout-form');
     const formMessageEl = document.getElementById('form-message');
 
+    // 1. Load Order Summary
+    // This is triggered by the DOMContentLoaded event handler below
     const total = cart.getTotalPrice();
     if (summaryTotalEl) {
         summaryTotalEl.textContent = `${total} грн`;
     }
 
-    if (!checkoutForm) { console.error("Checkout form element not found."); return; }
+    // Stop if the form doesn't exist
+    if (!checkoutForm) {
+        console.error("Checkout form element not found.");
+        return;
+    }
 
-    checkoutForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        formMessageEl.textContent = 'Обробка замовлення...';
-        formMessageEl.style.color = 'blue';
+    // 2. Add the submit event handler for the form
+    checkoutForm.addEventListener('submit', (e) => {
+        // Prevent the form from actually submitting (reloading the page)
+        e.preventDefault(); 
+        
+        // Clear previous messages
+        formMessageEl.textContent = '';
+        formMessageEl.style.color = 'black';
 
+        // Check if cart is empty
         if (cart.getTotalItemsCount() === 0) {
             formMessageEl.textContent = 'Ваш кошик порожній.';
             formMessageEl.style.color = 'red';
             return;
         }
 
-        const formData = new FormData(checkoutForm);
-        const orderData = {
-            user: {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                address: formData.get('address'),
-            },
-            paymentMethod: formData.get('payment-method'),
-            items: cart.getItems(),
-        };
+        // --- SEPARATION OF CONCERNS ---
+        // Here, the GUI (checkout.js) collects data...
+        // ...and passes it to the Business Logic Classes (User, Order, Payment)
 
         try {
-            // Send data to the SERVER
-            const response = await fetch('http://localhost:3001/order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData),
-            });
-            const result = await response.json();
-            if (!response.ok) { throw new Error(result.error || 'Невідома помилка сервера'); }
+            // Get data from the form controls
+            const formData = new FormData(checkoutForm);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const address = formData.get('address');
+            const paymentMethod = formData.get('payment-method');
+            
+            // --- 1. Use the User class ---
+            const user = new User(1, name, email);
+            // We use a non-trivial method with validation
+            const addressSet = user.setShippingAddress(address);
 
-            // --- UPDATED: Use the welcome message from the server ---
-            formMessageEl.innerHTML = `
-                <p style="color: green; font-weight: bold;">${result.welcomeMessage}</p> <p>Ваше замовлення #${result.orderId} успішно прийнято.</p>
-                <p>Вартість доставки: ${result.shippingCost} грн</p>
-                <p><b>Загальна сума: ${result.totalPaid} грн</b></p>
-                <p>Номер відстеження: <b>${result.trackingNumber}</b></p>`;
+            // Check if validation in the class failed
+            if (!addressSet) {
+                 // UI text remains in Ukrainian
+                 throw new Error('Адреса має бути довшою за 5 символів.');
+            }
+
+            // --- 2. Use the Order class ---
+            const order = new Order(101, user);
+            // Add items from the cart to the order
+            cart.getItems().forEach(item => order.addItem(item));
+
+            // Use a non-trivial method to get the final total
+            const orderTotal = order.calculateTotal();
+
+            // --- 3. Use the Payment class ---
+            const payment = new Payment(201, orderTotal, paymentMethod);
+            // Use a non-trivial method to process
+            payment.processPayment();
+            
+            // --- Success ---
+            console.log('Order successfully processed:', {
+                user: user.getName(),
+                address: user.getShippingAddress(),
+                total: orderTotal,
+                isPaid: payment.isPaid()
+            });
+
+            // Show success message to the user (UI text in Ukrainian)
+            formMessageEl.textContent = `Дякуємо, ${user.getName()}! Ваше замовлення #${order.getOrderId()} на суму ${orderTotal} грн прийнято.`;
             formMessageEl.style.color = 'green';
+            
+            // Disable the form
             checkoutForm.querySelector('button').disabled = true;
         } catch (error) {
+            // Handle any errors (e.g., from validation)
             console.error('Checkout failed:', error.message);
             formMessageEl.textContent = `Помилка: ${error.message}`;
             formMessageEl.style.color = 'red';
