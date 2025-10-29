@@ -4,75 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Квітковий Магазин - Головна</title>
-<style>
-    /* ... (all your existing styles remain here) ... */
-    
-    .product-list { 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 30px; 
-        padding: 0 40px;
-    }
-    .product-card { 
-        border: 1px solid #bbdefb; 
-        background-color: white;
-        padding: 20px; 
-        width: 250px; 
-        text-align: center; 
-        box-shadow: 5px 5px 10px rgba(13, 71, 161, 0.2);
-        border-radius: 10px;
-        /* NEW (Lab 2): Added transition for smooth hover effect */
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .product-image { 
-        max-width: 100%; 
-        height: auto; 
-        margin-bottom: 15px; 
-        border-radius: 5px;
-    }
-
-    /* NEW (Lab 2): Style for the clickable link area */
-    .product-link {
-        cursor: pointer;
-    }
-
-    /* NEW (Lab 2): Hover effect for the whole card */
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 8px 8px 15px rgba(13, 71, 161, 0.3);
-    }
-    
-    .add-to-cart-btn { 
-        background-color: #2196f3; 
-        color: white; 
-        padding: 10px 15px; 
-        border: none; 
-        cursor: pointer; 
-        border-radius: 5px; 
-        margin-top: 10px;
-        transition: background-color 0.3s;
-    }
-    .add-to-cart-btn:hover {
-        background-color: #0d47a1;
-    }
-    
-    /* ... (rest of your styles) ... */
-</style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <h1>Квітковий Магазин</h1>
-        <a href="cart.html" class="cart-link">
-            Кошик (<span id="cart-count">0</span>)
-        </a>
-    </header>
-
-    <h2>Наші найкращі пропозиції</h2>
-
-    <div id="product-list" class="product-list">
+        <div class="logo">
+            <a href="index.html">FLOWERS MARKET</a>
         </div>
 
-    <script type="module" src="js/main.js"></script>
-    
-    </body>
+        <div class="header-nav">
+            <a href="builder.html">Конструктор Букетів</a>
+
+            <a href="cart.html" class="cart-link">
+                <span class="cart-icon"></span> Кошик (<span id="cart-count">0</span>)
+            </a>
+        </div>
+    </header>
+
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1>FLOWERS MARKET</h1>
+            <a href="#product-list-heading" class="button-like-link hero-button">BUY NOW!</a>
+        </div>
+        </section>
+
+    <section class="featured-categories">
+        <div class="category-grid">
+            <div class="category-card">
+                <a href="#roses"> <div class="category-image placeholder"></div> <h3>100 & 1 ROSES</h3>
+                </a>
+            </div>
+            <div class="category-card">
+                <a href="#spring">
+                    <div class="category-image placeholder"></div>
+                    <h3>SPRING BOUQUET</h3>
+                </a>
+            </div>
+            <div class="category-card">
+                <a href="#roses-bouquets">
+                    <div class="category-image placeholder"></div>
+                    <h3>A BOUQUET OF ROSES</h3>
+                </a>
+            </div>
+            <div class="category-card">
+                <a href="#lilies">
+                    <div class="category-image placeholder"></div>
+                    <h3>A BOUQUET OF LILIES</h3>
+                </a>
+            </div>
+            <div class="category-card">
+                 <a href="#carnations">
+                    <div class="category-image placeholder"></div>
+                    <h3>A BOUQUET OF CARNATIONS</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+    <h2 id="product-list-heading">Наші найкращі пропозиції</h2>
+
+    <div id="product-list" class="product-list">
+        <p>Завантаження товарів...</p> </div>
+
+    <script type="module" src="js/cart.js"></script> <script type="module" src="js/main.js"></script> </body>
 </html>

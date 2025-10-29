@@ -4,96 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Деталі товару - Квітковий Магазин</title>
-<style>
-    /* Я скопіював усі стилі з index.html для узгодженого вигляду.
-      (header, cart-link, product-card, product-image, add-to-cart-btn, etc.)
-    */
-    body { 
-        font-family: sans-serif; 
-        margin: 0; 
-        background-color: #e3f2fd; 
-        color: #333;
-    }
-    header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        background-color: #bbdefb; 
-        padding: 15px 40px; 
-        margin-bottom: 30px;
-    }
-    .cart-link { 
-        font-size: 1.2em; 
-        text-decoration: none; 
-        color: #0d47a1; 
-        font-weight: bold;
-    }
-    h1, h2 { color: #0d47a1; }
-    
-    .add-to-cart-btn { 
-        background-color: #2196f3; 
-        color: white; 
-        padding: 10px 15px; 
-        border: none; 
-        cursor: pointer; 
-        border-radius: 5px; 
-        margin-top: 10px;
-        transition: background-color 0.3s;
-        font-size: 1.1em; /* Трохи більша кнопка */
-    }
-    .add-to-cart-btn:hover {
-        background-color: #0d47a1;
-    }
-    
-    /* Нові стилі для сторінки деталей */
-    .details-container {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 30px;
-        background-color: #fff;
-        border: 1px solid #bbdefb;
-        border-radius: 10px;
-        box-shadow: 5px 5px 10px rgba(13, 71, 161, 0.2);
-        text-align: center;
-    }
-    .details-container img {
-        max-width: 80%;
-        height: auto;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-    .details-container .product-price {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #0d47a1;
-        margin: 15px 0;
-    }
-    .back-link {
-        display: inline-block;
-        margin: 20px 0 0 40px;
-        font-size: 1.1em;
-        text-decoration: none;
-        color: #2196f3;
-    }
-    .back-link:hover {
-        text-decoration: underline;
-    }
-</style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <h1>Квітковий Магазин</h1>
-        <a href="cart.html" class="cart-link">
-            Кошик (<span id="cart-count">0</span>)
-        </a>
+        <div class="logo">
+            <a href="index.html">FLOWERS MARKET</a>
+        </div>
+
+        <div class="header-nav">
+            <a href="index.html">Головна</a>
+            <a href="builder.html">Конструктор Букетів</a>
+
+            <a href="cart.html" class="cart-link">
+                <span class="cart-icon"></span> Кошик (<span id="cart-count">0</span>)
+            </a>
+        </div>
     </header>
 
     <a href="index.html" class="back-link">← Повернутися до магазину</a>
 
     <div id="product-detail-container" class="details-container">
-        </div>
+        <p>Завантаження деталей товару...</p>
+    </div>
 
     <script type="module" src="js/cart.js"></script>
     <script type="module" src="js/details.js"></script>
 </body>
-</html>

@@ -1,19 +1,20 @@
-// Imports the product array and the Flower class, as its logic is needed
+// frontend/js/main.js
+
+// Imports the product array and the Flower class
+// In this version, we still import directly from backend
 import { products, Flower } from '../../backend/data/products/products.js';
 import { updateCartCount, addToCart } from './cart.js';
 
 const productListContainer = document.getElementById('product-list');
 
-// Function to generate a single product card
+// Function to generate a single product card (Original Lab 2 version)
 function renderProductCard(product) {
     const card = document.createElement('div');
-    card.className = 'product-card';
-    
-    // Checks if the item is a Flower to display additional information
+    card.className = 'product-card'; // Uses the original simpler class
+
     const isFlower = product instanceof Flower;
-    
-    // Card content
-    // I wrapped the image and title in a 'product-link' div for better click handling
+
+    // Original HTML structure for the card
     card.innerHTML = `
         <div class="product-link" data-id="${product.getId()}">
             <img src="${product.getImage()}" alt="${product.getName()}" class="product-image">
@@ -28,29 +29,27 @@ function renderProductCard(product) {
     // Click handler for the "Add to Cart" button
     const button = card.querySelector('.add-to-cart-btn');
     button.addEventListener('click', (e) => {
-        e.stopPropagation(); // Stop click from bubbling up to the card
+        e.stopPropagation(); // Stop click from bubbling up to the card link
         addToCart(product);
     });
 
-    // NEW (Lab 2): Click handler for the entire card (via the new div)
-    // This adds a new event handler
+    // Click handler for the card link area
     const linkArea = card.querySelector('.product-link');
     linkArea.addEventListener('click', () => {
-        // Redirect to details page, passing product ID in the URL
+        // Redirect to details page
         window.location.href = `details.html?id=${product.getId()}`;
     });
 
     return card;
 }
 
-// Function to display all products
+// Function to display all products (Original Lab 2 version)
 function renderProductList() {
     if (!productListContainer) return;
-    
-    // Clears the container
-    productListContainer.innerHTML = ''; 
 
-    // Adds product cards
+    productListContainer.innerHTML = ''; // Clear container
+
+    // Use the directly imported 'products' array
     products.forEach(product => {
         const cardElement = renderProductCard(product);
         productListContainer.appendChild(cardElement);
@@ -58,10 +57,7 @@ function renderProductList() {
 }
 
 // Launches product display after DOM content is loaded
-// This is our first event handler
 document.addEventListener('DOMContentLoaded', () => {
-    // Updates the cart counter on page load
-    updateCartCount(); 
-    // Displays the product list
-    renderProductList();
+    updateCartCount();
+    renderProductList(); // Render directly, no fetch needed in this version
 });

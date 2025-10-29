@@ -4,32 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кошик</title>
- <style>
-    /* ... (all your existing styles) ... */
-
-    /* Style for the link-button */
-    .checkout-btn {
-        background-color: #007bff; /* Color from the old button */
-        color: white; 
-        padding: 10px 15px; 
-        border: none; 
-        margin-top: 20px; 
-        cursor: pointer;
-        text-decoration: none; /* Remove underline */
-        border-radius: 5px; /* Add rounded corners */
-        font-size: 1em;
-        display: inline-block; /* Allows padding/margin to be applied */
-    }
-    .checkout-btn:hover {
-        background-color: #0056b3; /* Darken on hover */
-    }
-</style>
+ <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <h1>Ваш Кошик</h1>
-        <p><a href="index.html">← Повернутися до магазину</a></p>
-    </header>
+    <div class="logo">
+        <a href="index.html">FLOWERS MARKET</a>
+    </div>
+
+    <div class="header-nav">
+        <a href="index.html">Головна</a> <a href="builder.html">Конструктор Букетів</a>
+        
+        <a href="cart.html" class="cart-link">
+            <span class="cart-icon"></span> Кошик (<span id="cart-count">0</span>)
+        </a>
+    </div>
+</header>
 
     <div id="cart-items">
         </div>
