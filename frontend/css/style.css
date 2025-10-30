@@ -1,5 +1,3 @@
-/* frontend/css/style.css */
-
 /* --- Global Styles based on Figma --- */
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -70,12 +68,6 @@ h1, h2, h3 {
     font-weight: bold;
 }
 
-.cart-icon::before {
-    content: '🛒';
-    font-size: 1.5em;
-    color: #D87093;
-}
-
 button, .button-like-link {
     background-color: #FFB6C1; /* Light Pink */
     color: #FFFFFF;
@@ -107,7 +99,7 @@ button:disabled {
     position: relative;
     height: 60vh;
     min-height: 400px;
-    background-image: url('../images/other/banner_placeholder.jpg'); /* --- TODO: Replace path --- */
+    background-image: url('/images/MainPhoto.png'); /* --- TODO: Replace path --- */
     background-size: cover;
     background-position: center;
     display: flex;
@@ -527,4 +519,32 @@ button:disabled {
     padding: 15px 20px; /* Larger padding */
     font-size: 1.1em;
     /* Inherits general button styles */
+}
+/* --- NEW: Styles for Header Icons --- */
+
+/* Style for the new image-based icons in the header */
+.nav-icon {
+    height: 30px; /* Set a fixed height */
+    width: 30px; /* Set a fixed width */
+    object-fit: contain; /* Ensure icon scales nicely */
+    vertical-align: middle; /* Align with text (like the cart count) */
+    transition: transform 0.2s ease;
+}
+
+/* Add a little effect on hover for icon links */
+.nav-icon-link:hover .nav-icon {
+    transform: scale(1.1);
+}
+
+/* Adjust cart-link to look good with just icon + count */
+.cart-link {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Smaller gap between icon and count */
+    font-weight: bold;
+    font-size: 1.1em; /* Make the count text match other links */
+    color: #666; /* Match other nav links */
+}
+.cart-link:hover {
+    color: #D87093; /* Keep hover color */
 }

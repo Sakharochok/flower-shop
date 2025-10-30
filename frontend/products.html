@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Деталі товару - Квітковий Магазин</title>
+    <title>Каталог Товарів - Квітковий Магазин</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
+<header>
     <div class="logo">
         <a href="index.html">FLOWERS MARKET</a>
     </div>
@@ -17,11 +17,11 @@
         <a href="index.html">Головна</a> 
         
         <a href="builder.html" class="nav-icon-link" title="Конструктор Букетів">
-            <img src="/images/bunch.svg" alt="Bouquet Builder" class="nav-icon">
+            <img src="../images/bunch.svg" alt="Bouquet Builder" class="nav-icon">
         </a>
         
         <a href="cart.html" class="cart-link" title="Кошик">
-            <img src="/images/Cart.svg" alt="Cart" class="nav-icon cart-icon">
+            <img src="../images/Cart.svg" alt="Cart" class="nav-icon cart-icon">
             (<span id="cart-count">0</span>)
         </a>
     </div>
@@ -29,10 +29,12 @@
 
     <a href="index.html" class="back-link">← Повернутися до магазину</a>
 
-    <div id="product-detail-container" class="details-container">
-        <p>Завантаження деталей товару...</p>
-    </div>
+    <h2 id="category-heading" style="text-align: center; font-size: 2em; margin-top: 20px;">
+        Завантаження категорії...
+    </h2>
 
-    <script type="module" src="js/cart.js"></script>
-    <script type="module" src="js/details.js"></script>
-</body>
+    <div id="product-list" class="product-list">
+        <p>Завантаження товарів...</p> </div>
+
+    <script type="module" src="js/cart.js"></script> <script type="module" src="js/products.js"></script> </body>
+</html>
