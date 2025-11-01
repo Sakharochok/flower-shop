@@ -1,51 +1,48 @@
-// Class to represent the shopping cart
 export class Cart {
     #items;
     constructor() {
         this.#items = JSON.parse(localStorage.getItem('cart')) || [];
     }
-        getItems() {
+        
+    getItems() {
         return this.#items;
     }
 
-    // Non-trivial method
-    // Saves the cart contents to LocalStorage
     saveCart() {
         localStorage.setItem('cart', JSON.stringify(this.#items));
     }
 
-    // Non-trivial method
-    // Adds a product to the cart
-    addItem(product) {
+    addItem(product, quantityToAdd = 1) {
         const existingItem = this.#items.find(item => item.id === product.getId());
+        
         if (existingItem) {
-            existingItem.quantity += 1;
+            existingItem.quantity += quantityToAdd;
         } else {
-            this.#items.push({ id: product.getId(), name: product.getName(), price: product.getPrice(), quantity: 1 });
+            this.#items.push({ 
+                id: product.getId(), 
+                name: product.getName(), 
+                price: product.getPrice(), 
+                quantity: quantityToAdd,
+                image: typeof product.getImage === 'function' ? product.getImage() : '/images/placeholder.jpg' 
+            });
         }
         this.saveCart();
     }
 
-    // Non-trivial method
-    // Calculates the total number of items in the cart
     getTotalItemsCount() {
         return this.#items.reduce((sum, item) => sum + item.quantity, 0);
     }
 
-    // Non-trivial method
-    // Calculates the total price of the cart
     getTotalPrice() {
         return this.#items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }
-        // Non-trivial method
-    // Removes an item completely from the cart
+
     removeItem(productId) {
         this.#items = this.#items.filter(item => item.id !== productId);
         this.saveCart();
     }
 }
 
-// Creates a single cart instance
 const cartInstance = new Cart();
 const cartCountElement = document.getElementById('cart-count');
 
@@ -55,54 +52,69 @@ export function updateCartCount() {
     }
 }
 
-export function addToCart(product) {
-    cartInstance.addItem(product);
+export function addToCart(product, quantity = 1) {
+    cartInstance.addItem(product, quantity);
     updateCartCount();
-    alert(`Item "${product.getName()}" added to cart!`);
+    alert(`Item "${product.getName()}" (x${quantity}) added to cart!`);
 }
 
 export function renderCartItems() {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartTotalElement = document.getElementById('cart-total');
-    if (!cartItemsContainer || !cartTotalElement) return;
+    const cartItemsList = document.getElementById('cart-items-list');
+    const totalElement = document.getElementById('cart-total-price');
+    const emptyMessage = document.getElementById('cart-empty-message');
+    const buyButton = document.querySelector('.cart-header .buy-btn');
 
-    cartItemsContainer.innerHTML = '';
+    if (!cartItemsList || !totalElement || !emptyMessage || !buyButton) {
+        return;
+    }
+
+    cartItemsList.innerHTML = '';
     const items = cartInstance.getItems();
 
     if (items.length === 0) {
-        cartItemsContainer.innerHTML = '<p>The cart is empty.</p>';
+        emptyMessage.textContent = 'Your cart is empty.'; // (TRANSLATED)
+        emptyMessage.style.display = 'block';
+        buyButton.style.display = 'none';
     } else {
+        emptyMessage.style.display = 'none';
+        buyButton.style.display = 'block';
+
         items.forEach(item => {
             const itemElement = document.createElement('div');
-            itemElement.className = 'cart-item';
-            // Note: Keeping "грн" and "Видалити" in Ukrainian for UI consistency
-            itemElement.innerHTML = `
-                <span>${item.name} x ${item.quantity}</span>
-                <span>${item.price * item.quantity} грн</span>
-                <button class="remove-item-btn" data-id="${item.id}">Видалити</button>
-            `;
-            cartItemsContainer.appendChild(itemElement);
-        });
+            itemElement.className = 'cart-item-card';
+            
+            const itemTotalPrice = item.price * item.quantity;
 
-        // Adds event handlers for the "Remove" buttons
-        document.querySelectorAll('.remove-item-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const productId = parseInt(e.target.dataset.id);
-                // Calls the new Cart class method
-                cartInstance.removeItem(productId);
-                // Updates the display
-                renderCartItems();
-                updateCartCount();
-            });
+            itemElement.innerHTML = `
+                <button class="remove-item-btn" data-id="${item.id}">
+                    <img src="/images/close.svg" alt="Remove">
+                </button>
+                
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item-info">
+                    <h3>${item.name}</h3>
+                    <p>${item.quantity} PIECES - ${itemTotalPrice} UAH</p> </div>
+            `;
+            cartItemsList.appendChild(itemElement);
         });
     }
 
-    cartTotalElement.textContent = cartInstance.getTotalPrice();
+    totalElement.textContent = cartInstance.getTotalPrice();
+
+    document.querySelectorAll('.remove-item-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const buttonEl = e.currentTarget;
+            const productId = parseInt(buttonEl.dataset.id);
+            cartInstance.removeItem(productId);
+            renderCartItems();
+            updateCartCount();
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
-    if (document.getElementById('cart-items')) {
+    if (document.getElementById('cart-items-list')) {
         renderCartItems();
     }
 });

@@ -6,13 +6,24 @@ import { Graph } from '../../utils/graph.js'; // Requires graph class
 export class Bouquet extends ShopItem {
     #flowers;
     #isCustom;
+    #mainColor; // <-- NEW
+    #season;    // <-- NEW
 
-    constructor(id, name, price, image, flowers) {
+    constructor(id, name, price, image, flowers, mainColor, season) {
         super(id, name, price, image);
         // Ensure flowers is always an array
         this.#flowers = Array.isArray(flowers) ? flowers : [];
         this.#isCustom = false;
+        
+        // --- NEW ---
+        this.#mainColor = mainColor || 'Mixed'; // Default value
+        this.#season = season || 'All-Year';   // Default value
     }
+    
+    // --- NEW Getters ---
+    getMainColor() { return this.#mainColor; }
+    getSeason() { return this.#season; }
+    // --- End New Getters ---
 
     // Non-trivial method
     addFlower(flower) {
@@ -51,15 +62,11 @@ export class Bouquet extends ShopItem {
     }
 
     // --- UPDATED getDescription Method ---
-    // Provides a more generic description suitable even when
-    // the #flowers array isn't populated by the factory.
     getDescription() {
-        // Return a general description for pre-made bouquets
         return `A beautiful pre-arranged collection of flowers.`;
     }
     // --- End of update ---
 
-    // You might also want a method to get the actual flowers if needed later
     getFlowers() {
       return this.#flowers;
     }

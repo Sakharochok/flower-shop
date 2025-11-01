@@ -1,53 +1,45 @@
+// backend/utils/compatibilityGraph.js
+
 import { Graph } from './graph.js';
+// We are importing the NEW product list
 import { products } from '../data/products/products.js';
 
 /**
- * Creates and exports the master compatibility graph for all products.
- * The "weight" of an edge represents the "cost" or "difficulty"
- * of assembling two components together.
- * A lower cost is better.
+ * Creates and exports the updated compatibility graph.
  */
 function createMasterGraph() {
     const masterGraph = new Graph();
 
-    // 1. Add all products from our store as vertices in the graph
+    // 1. Add ALL products (including bouquets) as vertices
+    // This fixes the "Vertex not found" error
     for (const product of products) {
-        // We only add items that can be part of a bouquet
-        // (i.e., not pre-made bouquets or vases)
-        if (product.getId() < 100 || product.getId() === 200 || product.getId() === 202) {
-             masterGraph.addVertex(product.getName());
-        }
+        masterGraph.addVertex(product.getName());
     }
 
-    // 2. Define the edges (compatibility costs)
-    // This is a sample set of rules for our shop
-    
-    // --- Roses ---
-    masterGraph.addEdge('Rose (Red)', 'Silk Ribbon', 2); // Very compatible
-    masterGraph.addEdge('Rose (Red)', 'Greeting Card', 1);
-    masterGraph.addEdge('Rose (Red)', 'Rose (White)', 3);
-    masterGraph.addEdge('Rose (Red)', 'Gerbera (Pink)', 5); // Roses and Gerberas are ok
-    masterGraph.addEdge('Rose (Red)', 'Hydrangea (Pink)', 8); // Difficult pairing
+    // 2. Define the new compatibility rules (edges)
+    // We are ONLY using the builder flower names (with "(builder)")
 
-    masterGraph.addEdge('Rose (White)', 'Silk Ribbon', 2);
-    masterGraph.addEdge('Rose (White)', 'Hydrangea (White)', 6);
+    // --- Roses ---
+    masterGraph.addEdge('Pink Rose (builder)', 'White Rose (builder)', 3);
+    masterGraph.addEdge('Red Rose (builder)', 'White Rose (builder)', 3);
+    masterGraph.addEdge('Pink Rose (builder)', 'Red Rose (builder)', 4);
+
+    // --- Tulips ---
+    masterGraph.addEdge('Pink Tulip (builder)', 'White Tulip (builder)', 2);
+    masterGraph.addEdge('Red Tulip (builder)', 'White Tulip (builder)', 2);
+    masterGraph.addEdge('Pink Tulip (builder)', 'Red Tulip (builder)', 2);
+
+    // --- Lilies ---
+    masterGraph.addEdge('Pink Lily (builder)', 'White Lily (builder)', 4);
 
     // --- Gerberas ---
-    masterGraph.addEdge('Gerbera (Pink)', 'Silk Ribbon', 3);
-    masterGraph.addEdge('Gerbera (Pink)', 'Gerbera (Yellow)', 2);
-    masterGraph.addEdge('Gerbera (Pink)', 'Daisy (Field)', 4);
+    masterGraph.addEdge('Pink Gerbera (builder)', 'Sunflower (builder)', 6);
 
-    // --- Hydrangeas (difficult flowers) ---
-    masterGraph.addEdge('Hydrangea (Pink)', 'Silk Ribbon', 7); // Hard to tie
-    masterGraph.addEdge('Hydrangea (Pink)', 'Hydrangea (Blue)', 4);
-    masterGraph.addEdge('Hydrangea (Blue)', 'Hydrangea (White)', 4);
-
-    // --- Other ---
-    masterGraph.addEdge('Daisy (Field)', 'Silk Ribbon', 1); // Very easy
-    masterGraph.addEdge('Dianthus (Pink)', 'Gerbera (Yellow)', 3);
-    masterGraph.addEdge('Tulip (Yellow)', 'Tulip (Purple)', 2);
-    masterGraph.addEdge('Tulip (Yellow)', 'Daisy (Field)', 3);
-
+    // --- Mixed ---
+    masterGraph.addEdge('Pink Rose (builder)', 'Pink Tulip (builder)', 5); 
+    masterGraph.addEdge('White Rose (builder)', 'White Lily (builder)', 6); 
+    masterGraph.addEdge('Red Rose (builder)', 'Pink Gerbera (builder)', 7); 
+    
     return masterGraph;
 }
 

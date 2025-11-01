@@ -4,11 +4,14 @@
   "description": "Flower shop website project",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node backend/server.js",
     "doc:generate": "jsdoc -c jsdoc.json"
   },
   "devDependencies": {
     "jsdoc": "^4.0.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }
-

@@ -1,117 +1,198 @@
-// Import the factory
-import { createProductInstance } from './productFactory.js';
-// Import cart functions
-import { updateCartCount, addToCart } from './cart.js';
-// Import class definition for 'instanceof' check
-import { Flower } from '../../backend/data/products/Flower.js';
+import { updateCartCount } from './cart.js';
 
+// DOM Elements
 const productListContainer = document.getElementById('product-list');
+const emptyMessage = document.getElementById('products-empty-message');
 const categoryHeading = document.getElementById('category-heading');
+const seasonalBtn = document.getElementById('seasonal-filter-btn');
+const searchInput = document.getElementById('search-input');
+const filterToggleBtn = document.getElementById('other-filter-btn'); 
+const advancedFilterPanel = document.getElementById('advanced-filters');
+const minPriceInput = document.getElementById('min-price');
+const maxPriceInput = document.getElementById('max-price');
 
-/**
- * Fetches all products, then filters them based on the URL parameter
- */
-async function fetchAndFilterProducts() {
-    // 1. Read the category name from the URL (e.g., ?category=Roses)
-    const params = new URLSearchParams(window.location.search);
-    const category = params.get('category');
+// --- Global State Variables ---
+let allBouquetsInCategory = [];
+let currentCategory = 'All';
 
-    if (!category) {
-        if (categoryHeading) categoryHeading.textContent = 'Категорію не вибрано';
-        if (productListContainer) productListContainer.innerHTML = '<p>Будь ласка, поверніться та виберіть категорію.</p>';
-        return;
-    }
+let currentFilters = {
+    color: 'All',
+    season: 'All-Year',
+    search: '',
+    minPrice: 0,
+    maxPrice: 9999
+};
+
+function applyFilters() {
+    let filteredBouquets = allBouquetsInCategory;
     
-    // Update the heading
-    if (categoryHeading) categoryHeading.textContent = `Категорія: ${category}`;
-
-    try {
-        const response = await fetch('http://localhost:3001/products');
-        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-        const rawProducts = await response.json();
-        
-        // Convert raw data into class instances
-        const allClientSideProducts = rawProducts.map(createProductInstance).filter(p => p !== null);
-
-        // --- 2. THIS IS THE NEW LOGIC: Filter the products ---
-        const filteredProducts = allClientSideProducts.filter(product => {
-            // Check if the product name includes the category string
-            return product.getName().toLowerCase().includes(category.toLowerCase());
-        });
-        
-        // --- 3. Render only the filtered list ---
-        renderProductList(filteredProducts);
-
-    } catch (error) {
-        console.error('Failed to fetch or process products:', error);
-        if (productListContainer) {
-             productListContainer.innerHTML = '<p>Помилка завантаження товарів. Сервер запущено?</p>';
-        }
+    // ... (Filter logic remains the same) ...
+    if (currentFilters.color !== 'All') {
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.mainColor === currentFilters.color
+        );
     }
+    if (currentFilters.season !== 'All-Year') {
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.season !== 'All-Year' 
+        );
+    }
+    if (currentFilters.search) {
+        const lowerCaseSearch = currentFilters.search.toLowerCase();
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.name.toLowerCase().includes(lowerCaseSearch) 
+        );
+    }
+    filteredBouquets = filteredBouquets.filter(bouquet => {
+        const price = bouquet.price;
+        return price >= currentFilters.minPrice && price <= currentFilters.maxPrice;
+    });
+
+    renderProductList(filteredBouquets);
 }
 
-/**
- * Renders a list of product cards into the DOM
- * (This function is identical to the one in main.js)
- * @param {Array<ShopItem>} productsToRender - The array of products to display
- */
-function renderProductList(productsToRender) {
-    if (!productListContainer) return;
-    productListContainer.innerHTML = ''; // Clear "Loading..."
+function renderProductList(bouquetsToRender) {
+    if (!productListContainer || !emptyMessage) return;
+    
+    productListContainer.innerHTML = ''; 
 
-    if (!productsToRender || productsToRender.length === 0) {
-         productListContainer.innerHTML = '<p>Товарів цієї категорії не знайдено.</p>';
-         return;
-    }
-
-    productsToRender.forEach(product => {
-        if (!product) return;
-        try {
+    if (bouquetsToRender.length === 0) {
+        emptyMessage.textContent = 'No products found for this filter.'; // (TRANSLATED)
+        emptyMessage.style.display = 'block';
+    } else {
+        emptyMessage.style.display = 'none';
+        bouquetsToRender.forEach(product => {
             const cardElement = renderProductCard(product);
             productListContainer.appendChild(cardElement);
-        } catch (error) {
-            console.error("Error rendering product card for:", product?.getName ? product.getName() : product, error);
-        }
-    });
+        });
+    }
 }
 
-/**
- * Renders a single product card using a class instance
- * (This function is identical to the one in main.js)
- * @param {ShopItem} product - An instance of Flower, Bouquet, etc.
- */
 function renderProductCard(product) {
     const card = document.createElement('div');
-    card.className = 'product-card';
-    card.dataset.id = product.getId();
-
-    const isFlower = product.constructor.name === 'Flower';
-    const premiumBadge = product.isPricy && product.isPricy() ? `<span class="badge-premium">Преміум</span>` : '';
-
+    card.className = 'product-card-simple'; 
     card.innerHTML = `
-        ${premiumBadge}
-        <a href="details.html?id=${product.getId()}" class="product-link">
-            <img src="${product.getImage()}" alt="${product.getName()}" class="product-image">
-            <div class="product-content">
-                <h3>${product.getName()}</h3>
-                <p>${product.getDescription ? product.getDescription() : 'No description available.'}</p>
-                <p class="product-price">Ціна: ${product.getPrice()} грн</p>
-                 ${isFlower && product.isSuitableForTallVase ? `<p style="font-size: 0.8em; color: gray;">Довжина стебла: ${product.isSuitableForTallVase() ? 'Довге' : 'Коротке'}</p>` : ''}
-            </div>
+        <a href="details.html?id=${product.id}" class="product-link-simple">
+            <img src="${product.image}" alt="${product.name}" class="product-image-simple">
+            <h3>${product.name}</h3>
         </a>
-        <button class="add-to-cart-btn" data-id="${product.getId()}">Додати в кошик</button>
     `;
-
-    const button = card.querySelector('.add-to-cart-btn');
-    button.addEventListener('click', (e) => {
-        addToCart(product);
-    });
-
     return card;
 }
 
-// Main entry point
+async function fetchAndInitialize() {
+    if (!productListContainer) return;
+
+    try {
+        const params = new URLSearchParams(window.location.search);
+        currentCategory = params.get('category');
+        
+        if (!currentCategory) {
+            throw new Error('Category not specified in URL.'); // (TRANSLATED)
+        }
+
+        if (categoryHeading) categoryHeading.textContent = currentCategory;
+
+        const singularLookup = {
+            'Roses': 'Rose',
+            'Lilies': 'Lily',
+            'Peonies': 'Peony'
+        };
+        const singularCategory = singularLookup[currentCategory] || currentCategory;
+
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const allProducts = await response.json();
+        
+        allBouquetsInCategory = allProducts.filter(p => {
+            if (p.type !== 'Bouquet') return false;
+            const nameLower = p.name.toLowerCase();
+            if (p.season === currentCategory) return true;
+            if (nameLower.includes(currentCategory.toLowerCase())) return true;
+            if (nameLower.includes(singularCategory.toLowerCase())) return true;
+            return false;
+        });
+        
+        applyFilters();
+
+    } catch (error) {
+        console.error('Failed to fetch products:', error);
+        productListContainer.innerHTML = '';
+        emptyMessage.textContent = `Error loading products: ${error.message}`; // (TRANSLATED)
+        emptyMessage.style.display = 'block';
+        if (categoryHeading) categoryHeading.textContent = 'Error'; // (TRANSLATED)
+    }
+}
+
+// ... (All setup...Listener functions remain unchanged) ...
+function setupColorFilterListeners() {
+    const colorDots = document.querySelectorAll('.color-dot');
+    colorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const clickedColor = dot.dataset.color;
+            if (currentFilters.color === clickedColor) {
+                currentFilters.color = 'All';
+                dot.style.border = 'none';
+            } else {
+                currentFilters.color = clickedColor;
+                colorDots.forEach(d => d.style.border = 'none');
+                dot.style.border = '2px solid #EFC1CF';
+            }
+            applyFilters();
+        });
+    });
+}
+function setupSeasonalFilterListener() {
+    if (!seasonalBtn) return; 
+    seasonalBtn.addEventListener('click', () => {
+        if (currentFilters.season === 'All-Year') {
+            currentFilters.season = 'Seasonal';
+            seasonalBtn.style.backgroundColor = '#DBB0C0';
+            seasonalBtn.style.color = 'white';
+        } else {
+            currentFilters.season = 'All-Year';
+            seasonalBtn.style.backgroundColor = '#EFC1CF';
+            seasonalBtn.style.color = 'white';
+        }
+        applyFilters();
+    });
+}
+function setupSearchFilterListener() {
+    if (!searchInput) return;
+    searchInput.addEventListener('input', () => {
+        currentFilters.search = searchInput.value;
+        applyFilters();
+    });
+}
+function setupAdvancedFilterListener() {
+    if (filterToggleBtn) {
+        filterToggleBtn.addEventListener('click', () => {
+            const isHidden = advancedFilterPanel.style.display === 'none';
+            advancedFilterPanel.style.display = isHidden ? 'flex' : 'none';
+        });
+    }
+    if (minPriceInput) {
+        minPriceInput.addEventListener('input', () => {
+            currentFilters.minPrice = parseFloat(minPriceInput.value) || 0;
+            applyFilters();
+        });
+    }
+    if (maxPriceInput) {
+        maxPriceInput.addEventListener('input', () => {
+            currentFilters.maxPrice = parseFloat(maxPriceInput.value) || 9999;
+            applyFilters();
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
-    fetchAndFilterProducts(); // Call the new filtering function
+    fetchAndInitialize();
+    setupColorFilterListeners();
+    setupSeasonalFilterListener();
+    setupSearchFilterListener();
+    setupAdvancedFilterListener();
 });
