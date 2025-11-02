@@ -315,16 +315,17 @@ button:disabled {
 }
 .back-link:hover { color: #EFC1CF; text-decoration: underline; } /* NEW Pink */
 
-/* (UPDATED) Advanced Price Filter Panel */
 .advanced-filters {
     display: flex;
     justify-content: center;
     gap: 30px;
-    padding: 20px;
-    background-color: #F9EFF2;
+    padding: 15px; 
+    background-color: #FFFFFF;
     border-radius: 10px;
-    margin: -20px 40px 30px 40px; 
+    margin: 15px 40px 30px 40px; 
     border: 1px solid #F9EFF2;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .price-filter-group { display: flex; align-items: center; gap: 10px; }
 .price-filter-group label { font-weight: bold; color: #370017; } /* NEW Text Color */

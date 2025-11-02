@@ -66,7 +66,7 @@ function initializeCheckout() {
             checkoutForm.querySelector('button').disabled = true;
         } catch (error) {
             console.error('Checkout failed:', error.message);
-            formMessageEl.textContent = `Error: ${error.message}`; // (TRANSLATED)
+            formMessageEl.textContent = `Error: ${error.message}`; 
             formMessageEl.style.color = 'red';
         }
     });

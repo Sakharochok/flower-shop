@@ -38,7 +38,7 @@ export class Cart {
     }
 
     removeItem(productId) {
-        this.#items = this.#items.filter(item => item.id !== productId);
+        this.#items = this.#items.filter(item => item.id != productId);
         this.saveCart();
     }
 }
