@@ -104,7 +104,7 @@ export function renderCartItems() {
     document.querySelectorAll('.remove-item-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const buttonEl = e.currentTarget;
-            const productId = parseInt(buttonEl.dataset.id);
+            const productId = buttonEl.dataset.id;
             cartInstance.removeItem(productId);
             renderCartItems();
             updateCartCount();
