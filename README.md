@@ -1,123 +1,51 @@
-# Flower Shop
-Simple flower shop project — frontend + backend (Node.js).
+🌸 Flower Shop OOP Project
+This is a full-stack web application for an online flower shop, created as a project for the "Object-Oriented Programming Basics" course. The project consists of a Node.js backend that provides a REST API and a vanilla JavaScript frontend that implements the graphical user interface.
 
-This is an educational project that simulates the functionality of an online flower shop. It consists of a user-facing frontend and a logic-processing backend.
+Project Requirements Compliance Report
+This project was developed to meet the specifications outlined in the "General Requirements" and "Lab 2: GUI" documents.
 
-The project was developed as part of the "Object-Oriented Programming Fundamentals" course and serves as a practical demonstration of key OOP principles, including encapsulation, inheritance, polymorphism, and abstraction.
+General Requirements (0.general-requirements.docx)
+The project successfully implements all major general requirements for the course.
 
+The OOP design is central to the application. The codebase makes extensive use of OOP principles, including encapsulation (using private fields # in classes), inheritance (e.g., ShopItem as a base class for Bouquet and Flower), polymorphism (e.g., the getDescription() method), and abstraction (e.g., the Shipping base class).
 
-  Key Features
-Product Catalog: View an assortment of flowers, bouquets, and decor items.
-
-Shopping Cart: Add products to the cart and view the total quantity and price.
-
-Object-Oriented Model: The backend is built on a clear class system representing entities (User, Order) and products (Flower, Bouquet).
-
-Algorithmic Logic: Implements a graph-based algorithm (Minimum Spanning Tree) to find optimal flower combinations within a bouquet.
-
-Unit Tests: Includes a suite of tests to verify the correct functionality of key classes and methods.
-
-
-  OOP Requirements Compliance Report
-This project fully meets the requirements of the OOP course. Below is a detailed breakdown.
-
-Implemented Classes (14 Total)
-Product Classes: ShopItem, Flower, Bouquet, SpecialBouquet, DecorItem. These classes model the items sold in the shop.
-
-Entity Classes: User, Order, Payment, Shipping, NovaPoshtaShipping. These classes represent business-level entities.
-
-Utility/Infrastructure Classes: Store, Cart, Graph, DSU. These classes provide supporting functionality for storage, cart management, and algorithms.
-
-Encapsulation
-Encapsulation is fully implemented across the entire project. All class fields are declared as private using the # prefix (e.g., #id, #name, #price). This prevents direct external access and modification of an object's internal state. Data is only exposed and modified through public methods (getters and non-trivial methods), ensuring data integrity and hiding implementation details.
-
-Inheritance Hierarchies (2 Total)
-The project features two distinct inheritance chains, including one with three levels.
-
-Three-Level Product Hierarchy: This chain demonstrates deep inheritance where specialized classes extend and override functionality.
-
-ShopItem (Base class for all products)
-
-Bouquet (Inherits from ShopItem)
-
-SpecialBouquet (Inherits from Bouquet, adding specialized logic for themed bouquets)
-
-Shipping Hierarchy: This chain demonstrates abstraction, where a base class defines a contract for concrete implementations.
-
-Shipping (Abstract base class defining the interface for shipping methods)
-
-NovaPoshtaShipping (A concrete implementation of a shipping method)
-
-Polymorphism (3+ Independent Cases)
-The project demonstrates both dynamic and static polymorphism.
-
-Dynamic Polymorphism (via getDescription method): The base ShopItem class defines a virtual getDescription() method. This method is overridden in every descendant (Flower, DecorItem, Bouquet, SpecialBouquet) to provide a unique, type-specific description. This allows client code to call item.getDescription() on any product and get the correct description at runtime without knowing the object's concrete type.
-
-Dynamic Polymorphism (via calculateCost method): The abstract Shipping class declares a calculateCost() method that must be implemented by its subclasses. The NovaPoshtaShipping class provides a concrete implementation. This allows the system to calculate shipping costs for different carriers through a common interface.
-
-Static Polymorphism (Generics/Type Checking): The Store.addItem(item) method enforces a type constraint. It uses an instanceof ShopItem check to ensure that only objects belonging to the ShopItem inheritance tree can be added to the store. Attempting to add an incompatible object (e.g., a User) throws a runtime error, simulating generic type safety.
+The code is strictly separated by concern. The backend directory contains all business logic, data classes (entities, products), and the API server, while the frontend directory contains all GUI-related code (HTML, CSS, and client-side JavaScript). The project runs as a single program (node backend/server.js), which serves both the API and the static frontend files.
 
 
 
-List of Non-Trivial Methods (30+ Total)
-This is a comprehensive list of methods with logic beyond simple field assignment or retrieval.
+Modern software engineering practices have been followed. Source control (Git) was used throughout the development process, with regular commits to a remote GitHub repository. Unit tests are included (tests/oop-tests.js) to verify core class functionality, which is a mandatory requirement for the highest evaluation. Internationalization (i18n) has been implemented, with the entire frontend UI and all backend server responses being translated to and displayed in English.
 
-ShopItem.isPricy(): Checks if the item's price exceeds a predefined threshold.
 
-Flower.isSuitableForTallVase(): Returns true if the flower's stem is long enough for a tall vase.
 
-Bouquet.addFlower(): Adds a Flower object to the bouquet's internal collection.
 
-Bouquet.findOptimalFlowerConnections(): Applies graph theory (MST) to a provided compatibility graph to determine the most efficient way to assemble the bouquet components.
 
-SpecialBouquet.getOccasion(): Returns the specific occasion (e.g., 'Wedding') for the themed bouquet.
+The project also leverages external libraries, with express and cors being used in the backend to build the REST API. Error handling is implemented on both the server-side (using try...catch blocks in API endpoints) and the client-side (handling fetch promises and form validation). Finally, the project defines clear interfaces, including a Web GUI for users and a REST API for programmatic access.
 
-Store.addItem(): Adds an item to the store collection after verifying its type is ShopItem.
 
-Store.getTotalItemsCount(): Returns the total number of items currently in the store.
 
-Store.clearItems(): Empties the store's item collection.
 
-Store.getItemById(): Searches for and returns an item from the store by its unique ID.
+Lab 2: GUI Requirements (1.2.a.lab2-gui-generic.docx)
+The project fulfills all quantitative and qualitative requirements for the second laboratory assignment on GUI development. It follows the "Implementation of educational projects (independently)" variant on the Web platform.
 
-User.setShippingAddress(): Sets the user's address after validating that it meets a minimum length requirement.
 
-User.generateWelcomeMessage(): Creates a personalized welcome string for the user.
+The application features 6 distinct screens (exceeding the minimum of 4):
 
-Order.addItem(): Adds a product line item to the order.
+Home Page (index.html)
 
-Order.calculateTotal(): Computes the total cost of all items in the order, considering quantities.
+Category Page (products.html)
 
-Order.updateStatus(): Changes the order's status after validating it against a list of permissible values.
+Product Details Page (details.html)
 
-Payment.processPayment(): Simulates a payment transaction and updates the isPaid status.
+Shopping Cart Page (cart.html)
 
-Payment.isCardPayment(): Checks if the payment was made by card.
+Bouquet Builder (builder.html)
 
-Shipping.generateTrackingNumber(): Generates a unique, random tracking number for a shipment.
+Checkout Page (checkout.html)
 
-NovaPoshtaShipping.calculateCost(): Returns the fixed shipping cost for this specific carrier.
+In total, there are over 23 unique control elements (exceeding the minimum of 20). This includes 4 color filter buttons, a seasonal toggle button, a price filter toggle, 2 price range inputs, a search input field, 2 quantity buttons, 3 "Add to Cart" buttons, multiple "Remove from Cart" buttons, drag-and-drop elements, and 5 form controls on the checkout page.
 
-Cart.saveCart(): Serializes the cart's contents and saves them to the browser's localStorage.
+The project features 3 container elements that are dynamically populated with data (exceeding the minimum of 1): the main product list (.product-list), the cart items list (#cart-items-list), and the available components list in the builder (#available-items-list).
 
-Cart.addItem(): Adds a product to the cart, incrementing the quantity if the item already exists.
+There are well over 15 event handlers implemented (exceeding the minimum of 10). The application responds to DOMContentLoaded, click (for all buttons and filters), input (for search and price fields), dragstart, dragover, dragleave, drop (for the bouquet builder), and submit (for the checkout form).
 
-Cart.getTotalItemsCount(): Calculates the sum of quantities of all items in the cart.
-
-Cart.getTotalPrice(): Calculates the total price of all items, factoring in their quantities.
-
-Cart.removeItem(): Removes an entire product line from the cart using its ID.
-
-DSU.find(): Implements the find operation for a Disjoint Set Union data structure with path compression.
-
-DSU.union(): Implements the union operation to merge two sets in a DSU structure.
-
-Graph.addVertex(): Adds a new vertex to the graph's adjacency list.
-
-Graph.addEdge(): Adds a weighted, undirected edge between two existing vertices.
-
-Graph.removeEdge(): Removes an edge between two vertices from the graph.
-
-Graph.kruskalMST(): Implements Kruskal's algorithm to find the Minimum Spanning Tree of the graph.
-
-Graph.primMST(): Implements Prim's algorithm to find the Minimum Spanning Tree of the graph.
+Finally, the project maintains a strict separation of logic and GUI. The frontend JavaScript files are responsible only for handling user events and rendering data. All business logic, such as price calculations, bouquet complexity analysis (kruskalMST), and order processing, is handled exclusively by the backend classes and server.

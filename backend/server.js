@@ -9,12 +9,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.join(__dirname, '..');
 
+// (FIX) We import 'products' FIRST
 import { products, Bouquet, Flower, DecorItem } from './data/products/products.js';
 import { User } from './data/entities/User.js';
 import { Order } from './data/entities/Order.js';
 import { Payment } from './data/entities/Payment.js';
 import { NovaPoshtaShipping } from './data/entities/Shipping.js';
-import { compatibilityGraph } from './utils/compatibilityGraph.js';
+
+// (FIX) We import the FUNCTION, not the graph itself
+import { createMasterGraph } from './utils/compatibilityGraph.js';
+
+// (FIX) We create the graph HERE, after 'products' is loaded
+const compatibilityGraph = createMasterGraph(products);
 
 const app = express();
 const PORT = 3001;
@@ -55,7 +61,6 @@ function hydrateProduct(product) {
 
 
 // === API Endpoints ===
-
 app.get('/api/products', (req, res) => {
     const hydratedProducts = products.map(hydrateProduct); 
     res.json(hydratedProducts);
@@ -67,7 +72,7 @@ app.get('/api/products/:id', (req, res) => {
     if (product) {
         res.json(hydrateProduct(product)); 
     } else {
-        res.status(404).json({ error: 'Product not found' }); // (TRANSLATED)
+        res.status(404).json({ error: 'Product not found' });
     }
 });
 
@@ -83,11 +88,11 @@ app.post('/api/order', (req, res) => {
     const orderData = req.body;
     try {
         if (!orderData || !orderData.items || !orderData.user) {
-            return res.status(400).json({ error: 'Empty or incorrect order data' }); // (TRANSLATED)
+            return res.status(400).json({ error: 'Empty or incorrect order data' });
         }
         const user = new User(Date.now(), orderData.user.name, orderData.user.email);
         const addressSet = user.setShippingAddress(orderData.user.address);
-        if (!addressSet) { throw new Error('Address must be longer than 5 characters.'); } // (TRANSLATED)
+        if (!addressSet) { throw new Error('Address must be longer than 5 characters.'); }
         
         const order = new Order(Date.now() + 1, user);
         orderData.items.forEach(item => order.addItem(item));
@@ -103,7 +108,7 @@ app.post('/api/order', (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Order processed successfully!', // (TRANSLATED)
+            message: 'Order processed successfully!',
             orderId: order.getOrderId(),
             customerName: user.getName(),
             welcomeMessage: user.generateWelcomeMessage(),
@@ -121,7 +126,7 @@ app.post('/api/order', (req, res) => {
 app.post('/api/build-bouquet', (req, res) => {
      const { componentNames } = req.body;
      if (!componentNames || componentNames.length < 2) {
-        return res.status(400).json({ success: false, error: 'Bouquet must have at least 2 components.' }); // (TRANSLATED)
+        return res.status(400).json({ success: false, error: 'Bouquet must have at least 2 components.' });
      }
      try {
         const components = products.filter(p => componentNames.includes(p.getName()));
@@ -136,7 +141,7 @@ app.post('/api/build-bouquet', (req, res) => {
         });
      } catch (error) {
         console.error('Bouquet build error:', error.message);
-        res.status(500).json({ success: false, error: 'Error processing bouquet logic.' }); // (TRANSLATED)
+        res.status(500).json({ success: false, error: 'Error processing bouquet logic.' });
      }
 });
 

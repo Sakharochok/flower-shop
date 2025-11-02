@@ -9,19 +9,18 @@ class DSU {
             this.#parent.set(v, v);
         }
     }
-    // Non-trivial method: Find the representative of the set containing vertex i (with path compression)
     find(i) {
+        if (!this.#parent.has(i)) return undefined; // (FIX) Handle missing vertex
         if (this.#parent.get(i) === i) {
             return i;
         }
         this.#parent.set(i, this.find(this.#parent.get(i)));
         return this.#parent.get(i);
     }
-    // Non-trivial method: Union of two sets
     union(i, j) {
         const rootI = this.find(i);
         const rootJ = this.find(j);
-        if (rootI !== rootJ) {
+        if (rootI !== rootJ && rootI !== undefined && rootJ !== undefined) {
             this.#parent.set(rootI, rootJ);
             return true;
         }
@@ -39,72 +38,65 @@ export class Graph {
         this.#edges = [];
     }
 
-    // Non-trivial method: Adds a vertex (flower, decor, etc.)
     addVertex(vertex) {
         if (!this.#adjacencyList.has(vertex)) {
             this.#adjacencyList.set(vertex, []);
         }
     }
 
-    // Non-trivial method: Adds an edge with weight (e.g., compatibility or connection cost)
-    // Weight is the cost/compatibility index
     addEdge(v1, v2, weight) {
-        if (!this.#adjacencyList.has(v1) || !this.#adjacencyList.has(v2)) {
-            throw new Error("Vertex not found in graph.");
+        if (!this.#adjacencyList.has(v1)) {
+            throw new Error(`Vertex ${v1} not found. Cannot add edge.`);
         }
-        // Add edge to adjacency list (undirected graph)
+        if (!this.#adjacencyList.has(v2)) {
+            throw new Error(`Vertex ${v2} not found. Cannot add edge.`);
+        }
         this.#adjacencyList.get(v1).push({ node: v2, weight: weight });
         this.#adjacencyList.get(v2).push({ node: v1, weight: weight });
-
-        // Add to edge list for Kruskal's
         this.#edges.push({ v1, v2, weight });
     }
 
-    // Non-trivial method: Removes an edge
     removeEdge(v1, v2) {
-        // Remove from adjacency list for v1
         this.#adjacencyList.set(v1, this.#adjacencyList.get(v1).filter(edge => edge.node !== v2));
-        // Remove from adjacency list for v2
         this.#adjacencyList.set(v2, this.#adjacencyList.get(v2).filter(edge => edge.node !== v1));
-        // Remove from edge list
         this.#edges = this.#edges.filter(e => !(
             (e.v1 === v1 && e.v2 === v2) || (e.v1 === v2 && e.v2 === v1)
         ));
     }
 
-    // Getter for edges (needed for Kruskal's)
     getEdges() {
         return this.#edges;
     }
-    // Getter for vertices (needed for Prim's)
     getVertices() {
         return Array.from(this.#adjacencyList.keys());
     }
 
-    // Non-trivial method (Algorithm 1): Kruskal's Algorithm for Minimum Spanning Tree
-    // Kruskal's is generally better for sparse graphs
+    // (FIX) THIS IS THE CORRECT KRUSKAL FUNCTION
     kruskalMST() {
-        // Sort edges by weight
         const sortedEdges = [...this.#edges].sort((a, b) => a.weight - b.weight);
         const dsu = new DSU(this.getVertices());
         const mst = [];
-        let mstWeight = 0;
+        
+        // (FIX) mstWeight MUST be initialized to 0
+        let mstWeight = 0; 
 
         for (const edge of sortedEdges) {
             if (dsu.union(edge.v1, edge.v2)) {
                 mst.push(edge);
-                mstWeight += edge.weight;
+                // (FIX) Ensure weight is a number
+                mstWeight += (edge.weight || 0); 
             }
         }
+        // (FIX) It MUST return both mst and weight
         return { mst, weight: mstWeight };
     }
 
-    // Non-trivial method (Algorithm 2): Prim's Algorithm for Minimum Spanning Tree
-    // Prim's is generally better for dense graphs
+    // (This function is also fixed for safety)
     primMST(startVertex) {
         const vertices = this.getVertices();
+        if (vertices.length === 0) return { mst: [], weight: 0 };
         if (!vertices.includes(startVertex)) {
-            throw new Error("Start vertex not found.");
+            startVertex = vertices[0]; 
         }
 
         const distances = new Map(vertices.map(v => [v, Infinity]));
@@ -117,7 +109,6 @@ export class Graph {
         let unvisited = [...vertices];
 
         while (unvisited.length > 0) {
-            // Find the unvisited vertex with the minimum distance (simulated priority queue)
             let minDistance = Infinity;
             let currentVertex = null;
             let minIndex = -1;
@@ -131,21 +122,18 @@ export class Graph {
                 }
             }
 
-            if (currentVertex === null) break; // Disconnected graph
+            if (currentVertex === null) break;
 
-            // Move current vertex from unvisited to visited
             unvisited.splice(minIndex, 1);
             visited.add(currentVertex);
             
             if (parents.get(currentVertex) !== null) {
-                // Add the edge that led to this vertex in the MST
                 const parent = parents.get(currentVertex);
                 const weight = distances.get(currentVertex);
                 mst.push({ v1: parent, v2: currentVertex, weight });
-                mstWeight += weight;
+                mstWeight += (weight || 0);
             }
 
-            // Update distances for neighbors
             for (const edge of this.#adjacencyList.get(currentVertex)) {
                 if (!visited.has(edge.node) && edge.weight < distances.get(edge.node)) {
                     distances.set(edge.node, edge.weight);

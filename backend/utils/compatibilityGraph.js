@@ -1,24 +1,21 @@
 // backend/utils/compatibilityGraph.js
 
 import { Graph } from './graph.js';
-// We are importing the NEW product list
-import { products } from '../data/products/products.js';
+// (FIX) Ми ПРИБРАЛИ звідси імпорт 'products'.
 
 /**
- * Creates and exports the updated compatibility graph.
+ * (FIX) Створює та експортує граф сумісності
+ * Тепер він ПРИЙМАЄ 'products' як аргумент.
  */
-function createMasterGraph() {
+export function createMasterGraph(products) {
     const masterGraph = new Graph();
 
-    // 1. Add ALL products (including bouquets) as vertices
-    // This fixes the "Vertex not found" error
+    // 1. Додаємо ВСІ продукти (включно з букетами) як вершини
     for (const product of products) {
         masterGraph.addVertex(product.getName());
     }
 
-    // 2. Define the new compatibility rules (edges)
-    // We are ONLY using the builder flower names (with "(builder)")
-
+    // 2. Визначаємо нові правила сумісності (ребра)
     // --- Roses ---
     masterGraph.addEdge('Pink Rose (builder)', 'White Rose (builder)', 3);
     masterGraph.addEdge('Red Rose (builder)', 'White Rose (builder)', 3);
@@ -42,6 +39,3 @@ function createMasterGraph() {
     
     return masterGraph;
 }
-
-// Create and export the single instance of the graph
-export const compatibilityGraph = createMasterGraph();

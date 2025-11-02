@@ -153,7 +153,7 @@ async function handleCalculateClick() {
             throw new Error(result.error || 'Unknown server error');
         }
         
-        const assemblyCost = result.weight;
+        const assemblyCost = result.assemblyCost;
         const complexityCharge = assemblyCost * numberOfFlowers;
         const finalBouquetPrice = totalFlowerPrice + complexityCharge;
 

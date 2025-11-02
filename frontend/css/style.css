@@ -4,6 +4,7 @@ body {
     margin: 0;
     background-color: #FFFFFF; 
     color: #370017; /* NEW Text Color */
+    scroll-behavior: smooth;
 }
 
 /* === NEW Header (Figma) === */
