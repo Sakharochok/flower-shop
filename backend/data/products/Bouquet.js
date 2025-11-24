@@ -2,13 +2,26 @@
 
 import { ShopItem } from './ShopItem.js';
 import { Graph } from '../../utils/graph.js'; // Requires graph class
-
+/**
+ * Class representing a Bouquet, a collection of flowers.
+ * @class
+ * @extends ShopItem
+ */
 export class Bouquet extends ShopItem {
     #flowers;
     #isCustom;
     #mainColor;
     #season;
-
+    /**
+     * Creates a Bouquet instance.
+     * @param {number} id - ID.
+     * @param {string} name - Name.
+     * @param {number} price - Price.
+     * @param {string} image - Image path.
+     * @param {Array<Flower>} flowers - Array of Flower objects in the bouquet.
+     * @param {string} [mainColor='Mixed'] - The dominant color.
+     * @param {string} [season='All-Year'] - Seasonality.
+     */
     constructor(id, name, price, image, flowers, mainColor, season) {
         super(id, name, price, image);
         this.#flowers = Array.isArray(flowers) ? flowers : [];
@@ -24,6 +37,13 @@ export class Bouquet extends ShopItem {
         this.#flowers.push(flower);
         this.#isCustom = true;
     }
+    /**
+     * Finds the Optimal Flower Connections using an MST algorithm (Kruskal or Prim).
+     * @method
+     * @param {Graph} graph - The master graph of all flower compatibilities.
+     * @param {string} [algorithmName='Kruskal'] - The algorithm name ('Kruskal' or 'Prim').
+     * @returns {Object} An object containing the MST results: { mst: Array, weight: number, algorithm: string }.
+     */
 
     // (FIX) This is the confirmed working version of this function
     findOptimalFlowerConnections(graph, algorithmName = 'Kruskal') {

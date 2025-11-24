@@ -1,9 +1,20 @@
+/**
+ * Class managing the shopping cart state using Local Storage.
+ * @class
+ * @name Cart
+ */
 export class Cart {
     #items;
     constructor() {
         this.#items = JSON.parse(localStorage.getItem('cart')) || [];
     }
-        
+      
+    /**
+     * Adds an item to the cart or increments its quantity.
+     * @method
+     * @param {Object} product - The product object (must have getName, getId, getPrice, etc.).
+     * @param {number} [quantityToAdd=1] - The number of units to add.
+     */
     getItems() {
         return this.#items;
     }
@@ -28,11 +39,18 @@ export class Cart {
         }
         this.saveCart();
     }
-
+    /**
+     * Calculates the total count of all items in the cart.
+     * @returns {number} The total quantity of items.
+     */
     getTotalItemsCount() {
         return this.#items.reduce((sum, item) => sum + item.quantity, 0);
     }
 
+    /**
+     * Calculates the total price of all items in the cart.
+     * @returns {number} The total price.
+     */
     getTotalPrice() {
         return this.#items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }
@@ -46,12 +64,21 @@ export class Cart {
 const cartInstance = new Cart();
 const cartCountElement = document.getElementById('cart-count');
 
+/**
+ * Exports function to update the cart count displayed in the header UI.
+ * @function
+ */
 export function updateCartCount() {
     if (cartCountElement) {
         cartCountElement.textContent = cartInstance.getTotalItemsCount();
     }
 }
-
+/**
+ * Adds a product to the cart and notifies the user.
+ * @function
+ * @param {Object} product - The product object to add.
+ * @param {number} [quantity=1] - Quantity to add.
+ */
 export function addToCart(product, quantity = 1) {
     cartInstance.addItem(product, quantity);
     updateCartCount();

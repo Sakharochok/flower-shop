@@ -1,9 +1,19 @@
-// backend/data/Shipping.js
-
+/**
+ * Abstract base class for handling shipping details and cost calculation.
+ * Cannot be instantiated directly.
+ * @abstract
+ * @class
+ */
 // --- Abstract base class for Shipping (Abstraction) ---
 export class Shipping { // <-- Зверніть увагу, що тут теж потрібен export
     #shippingId;
     #address;
+    /**
+     * Constructor for the base shipping class.
+     * @param {number} shippingId - The shipping ID.
+     * @param {string} address - The delivery address.
+     * @throws {Error} If attempting to instantiate the abstract class directly.
+     */
     constructor(shippingId, address) {
         // Enforcing abstraction: cannot instantiate directly
         if (this.constructor === Shipping) {
@@ -14,7 +24,13 @@ export class Shipping { // <-- Зверніть увагу, що тут теж �
     }
     getShippingId() { return this.#shippingId; }
     getAddress() { return this.#address; }
-
+    /**
+     * Calculates the cost of shipping.
+     * Must be implemented by derived classes (Polymorphism).
+     * @abstract
+     * @returns {number} The shipping cost.
+     * @throws {Error} If the method is not overridden in a derived class.
+     */
     // Polymorphic method: must be implemented by derived classes
     calculateCost() {
         throw new Error("Method calculateCost() must be implemented by derived classes.");

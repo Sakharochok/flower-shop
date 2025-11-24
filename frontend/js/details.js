@@ -1,9 +1,15 @@
+/**
+ * Module handling the display and interaction logic for a single product details page.
+ * @module details
+ */
 // Import cart functions
 import { updateCartCount, addToCart } from './cart.js';
 
 /**
- * Main function to fetch and render
- * a single product by its ID based on Figma design.
+ * Main function to fetch product data from the API based on URL ID and render the details.
+ * @async
+ * @function
+ * @throws {Error} If Product ID is missing in the URL or the product is not found.
  */
 async function renderProductDetails() {
     

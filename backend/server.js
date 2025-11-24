@@ -1,5 +1,8 @@
-// backend/server.js
-
+/**
+ * Main Express server application file.
+ * Handles API endpoints, static file serving, and core business logic execution.
+ * @module server
+ */
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -32,6 +35,13 @@ app.use(express.static(path.join(projectRoot, 'frontend')));
 app.use('/images', express.static(path.join(projectRoot, 'images')));
 app.use('/entities', express.static(path.join(projectRoot, 'backend/data/entities')));
 
+/**
+ * Helper function to transform complex product objects (class instances) 
+ * into simple Data Transfer Objects (DTOs) for API response.
+ * @function
+ * @param {Object} product - An instance of a product class (Flower, Bouquet, etc.).
+ * @returns {Object} A simplified object containing key product data.
+ */
 // === "Hydration" Helper Function ===
 function hydrateProduct(product) {
     const data = {
@@ -57,6 +67,15 @@ function hydrateProduct(product) {
     
     return data;
 }
+
+// === API Endpoints ===
+// Documentation for routes is typically done via tools like Swagger, 
+// but we add brief comments for context here.
+
+// app.get('/api/products', ...) - Returns all products.
+// app.get('/api/products/:id', ...) - Returns a single product by ID.
+// app.post('/api/order', ...) - Processes a new customer order.
+// app.post('/api/build-bouquet', ...) - Calculates assembly cost using graph algorithms.
 // === END OF FUNCTION ===
 
 

@@ -1,5 +1,9 @@
 //(Module Aggregator)
-
+/**
+ * Module aggregator for all core business entities.
+ * Exports all main classes for clean importing.
+ * @module entities
+ */
 // Import all entities from their respective individual files
 import { User } from './User.js';
 import { Order } from './Order.js';

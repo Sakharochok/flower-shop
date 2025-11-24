@@ -1,9 +1,18 @@
+/**
+ * Module handling the checkout process and integration with backend entities.
+ * @module checkout
+ */
 import { Cart } from './cart.js';
 import { updateCartCount } from './cart.js';
 import { User, Order, Payment } from '/entities/entities.js';
 
+
 const cart = new Cart();
 
+/**
+ * Main function to initialize the checkout page and handle form submission.
+ * @function
+ */
 function initializeCheckout() {
     updateCartCount();
     const summaryTotalEl = document.getElementById('summary-total');

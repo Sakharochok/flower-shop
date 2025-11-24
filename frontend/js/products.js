@@ -1,3 +1,7 @@
+/**
+ * Module for the Product Catalog page, handling category-specific display and filtering.
+ * @module products
+ */
 import { updateCartCount } from './cart.js';
 
 // DOM Elements
@@ -23,6 +27,10 @@ let currentFilters = {
     maxPrice: 9999
 };
 
+/**
+ * Applies filters (color, season, price, search) to the category-specific bouquet list.
+ * @function
+ */
 function applyFilters() {
     let filteredBouquets = allBouquetsInCategory;
     
@@ -80,6 +88,12 @@ function renderProductCard(product) {
     return card;
 }
 
+/**
+ * Fetches products, determines the category from URL, and initializes the list.
+ * @async
+ * @function
+ * @throws {Error} If category is missing or fetching from API fails.
+ */
 async function fetchAndInitialize() {
     if (!productListContainer) return;
 

@@ -1,5 +1,10 @@
 // backend/data/products/products.js
 
+/**
+ * Module aggregator for all shop products and product-related classes.
+ * Contains the main array of all available products.
+ * @module products
+ */
 import { ShopItem } from './ShopItem.js';
 import { Flower } from './Flower.js';
 import { Bouquet } from './Bouquet.js';
@@ -11,6 +16,11 @@ import { SpecialBouquet } from './SpecialBouquet.js';
 // PRODUCTS ARRAY
 // =========================================================================
 
+/**
+ * Array of all available products in the shop.
+ * Contains instances of Flower, Bouquet, DecorItem, etc.
+ * @type {Array<ShopItem>}
+ */
 const products = [
     
     // === 1. BUILDER COMPONENTS (SINGLE FLOWERS with .png) ===

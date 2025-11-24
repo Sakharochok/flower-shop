@@ -1,19 +1,28 @@
-
 // This module defines the Store container class, demonstrating Static Polymorphism (Generics).
 
-// Import the base class to ensure type checking in addItem method
 import { ShopItem } from './ShopItem.js'; 
-
+/**
+ * Container class (Store) for holding shop items.
+ * Demonstrates the concept of Static Polymorphism (Generics).
+ * @class
+ */
 // --- Container class for Static Polymorphism (Generics) ---
 export class Store {
     #items;
-    
+    /**
+     * @constructor
+     */
     constructor() {
         this.#items = [];
     }
-    
+    /**
+     * Adds an item to the store with a type check.
+     * @method
+     * @param {ShopItem} item - An element that inherits from ShopItem.
+     * @throws {Error} If the element does not inherit from ShopItem.
+     */
+
     // Non-trivial method: Adds an item with type check
-    // This method ensures only objects inheriting from ShopItem can be stored.
     addItem(item) {
         if (item instanceof ShopItem) {
             this.#items.push(item);
@@ -22,7 +31,10 @@ export class Store {
             throw new Error("Element must inherit from ShopItem."); 
         }
     }
-    
+    /**
+     * Returns the total number of elements in the store.
+     * @returns {number} The count of items.
+     */
     // Non-trivial method: Returns the total number of elements
     getTotalItemsCount() {
         return this.#items.length;

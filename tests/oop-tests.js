@@ -3,6 +3,10 @@ import { Flower, Bouquet, SpecialBouquet, DecorItem, Store, ShopItem } from '../
 import { User, Order, Payment, Shipping, NovaPoshtaShipping } from '../backend/data/entities/entities.js';
 import { Graph } from '../backend/utils/graph.js';
 
+/**
+ * Module containing unit tests for OOP and core business logic.
+ * @module oop-tests
+ */
 // --- Test Runner ---
 const describe = (description, fn) => {
     console.log(`\n--- ${description} ---`);
