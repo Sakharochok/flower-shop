@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/utils/graph.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/utils/graph.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// backend/utils/graph.js
+/**
+ * Helper class for Disjoint Set Union (DSU) structure used in Kruskal's algorithm.
+ * @class
+ */
+// Helper class for Disjoint Set Union (DSU) used in Kruskal's
+class DSU {
+    #parent;
+    constructor(vertices) {
+        this.#parent = new Map();
+        for (const v of vertices) {
+            this.#parent.set(v, v);
+        }
+    }
+    find(i) {
+        if (!this.#parent.has(i)) return undefined; // (FIX) Handle missing vertex
+        if (this.#parent.get(i) === i) {
+            return i;
+        }
+        this.#parent.set(i, this.find(this.#parent.get(i)));
+        return this.#parent.get(i);
+    }
+    union(i, j) {
+        const rootI = this.find(i);
+        const rootJ = this.find(j);
+        if (rootI !== rootJ &amp;&amp; rootI !== undefined &amp;&amp; rootJ !== undefined) {
+            this.#parent.set(rootI, rootJ);
+            return true;
+        }
+        return false;
+    }
+}
+/**
+ * Main Graph Class.
+ * Implements methods for adding vertices, edges, and finding the Minimum Spanning Tree (MST).
+ * @class
+ */
+
+// --- Main Graph Class ---
+export class Graph {
+    #adjacencyList;
+    #edges;
+
+    constructor() {
+        this.#adjacencyList = new Map();
+        this.#edges = [];
+    }
+
+    addVertex(vertex) {
+        if (!this.#adjacencyList.has(vertex)) {
+            this.#adjacencyList.set(vertex, []);
+        }
+    }
+    /**
+     * Adds a weighted edge between two vertices.
+     * @param {string} v1 - First vertex name.
+     * @param {string} v2 - Second vertex name.
+     * @param {number} weight - The weight/compatibility score of the edge.
+     * @throws {Error} If one of the vertices is not found.
+     */
+    addEdge(v1, v2, weight) {
+        if (!this.#adjacencyList.has(v1)) {
+            throw new Error(`Vertex ${v1} not found. Cannot add edge.`);
+        }
+        if (!this.#adjacencyList.has(v2)) {
+            throw new Error(`Vertex ${v2} not found. Cannot add edge.`);
+        }
+        this.#adjacencyList.get(v1).push({ node: v2, weight: weight });
+        this.#adjacencyList.get(v2).push({ node: v1, weight: weight });
+        this.#edges.push({ v1, v2, weight });
+    }
+
+    removeEdge(v1, v2) {
+        this.#adjacencyList.set(v1, this.#adjacencyList.get(v1).filter(edge => edge.node !== v2));
+        this.#adjacencyList.set(v2, this.#adjacencyList.get(v2).filter(edge => edge.node !== v1));
+        this.#edges = this.#edges.filter(e => !(
+            (e.v1 === v1 &amp;&amp; e.v2 === v2) || (e.v1 === v2 &amp;&amp; e.v2 === v1)
+        ));
+    }
+
+    getEdges() {
+        return this.#edges;
+    }
+    getVertices() {
+        return Array.from(this.#adjacencyList.keys());
+    }
+    /**
+     * Finds the Minimum Spanning Tree (MST) using Kruskal's algorithm.
+     * @method
+     * @returns {Object} Returns { mst: Array, weight: number }.
+     */
+    // (FIX) THIS IS THE CORRECT KRUSKAL FUNCTION
+    kruskalMST() {
+        const sortedEdges = [...this.#edges].sort((a, b) => a.weight - b.weight);
+        const dsu = new DSU(this.getVertices());
+        const mst = [];
+        
+        // (FIX) mstWeight MUST be initialized to 0
+        let mstWeight = 0; 
+
+        for (const edge of sortedEdges) {
+            if (dsu.union(edge.v1, edge.v2)) {
+                mst.push(edge);
+                // (FIX) Ensure weight is a number
+                mstWeight += (edge.weight || 0); 
+            }
+        }
+        // (FIX) It MUST return both mst and weight
+        return { mst, weight: mstWeight };
+    }
+    /**
+     * Finds the Minimum Spanning Tree (MST) using Prim's algorithm.
+     * @method
+     * @param {string} startVertex - The starting vertex for the traversal.
+     * @returns {Object} Returns { mst: Array, weight: number }.
+     */
+    // (This function is also fixed for safety)
+    primMST(startVertex) {
+        const vertices = this.getVertices();
+        if (vertices.length === 0) return { mst: [], weight: 0 };
+        if (!vertices.includes(startVertex)) {
+            startVertex = vertices[0]; 
+        }
+
+        const distances = new Map(vertices.map(v => [v, Infinity]));
+        const parents = new Map(vertices.map(v => [v, null]));
+        const visited = new Set();
+        distances.set(startVertex, 0);
+
+        const mst = [];
+        let mstWeight = 0;
+        let unvisited = [...vertices];
+
+        while (unvisited.length > 0) {
+            let minDistance = Infinity;
+            let currentVertex = null;
+            let minIndex = -1;
+
+            for (let i = 0; i &lt; unvisited.length; i++) {
+                const v = unvisited[i];
+                if (distances.get(v) &lt; minDistance) {
+                    minDistance = distances.get(v);
+                    currentVertex = v;
+                    minIndex = i;
+                }
+            }
+
+            if (currentVertex === null) break;
+
+            unvisited.splice(minIndex, 1);
+            visited.add(currentVertex);
+            
+            if (parents.get(currentVertex) !== null) {
+                const parent = parents.get(currentVertex);
+                const weight = distances.get(currentVertex);
+                mst.push({ v1: parent, v2: currentVertex, weight });
+                mstWeight += (weight || 0);
+            }
+
+            for (const edge of this.#adjacencyList.get(currentVertex)) {
+                if (!visited.has(edge.node) &amp;&amp; edge.weight &lt; distances.get(edge.node)) {
+                    distances.set(edge.node, edge.weight);
+                    parents.set(edge.node, currentVertex);
+                }
+            }
+        }
+        return { mst, weight: mstWeight };
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

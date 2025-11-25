@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/js/details.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/js/details.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Module handling the display and interaction logic for a single product details page.
+ * @module details
+ */
+// Import cart functions
+import { updateCartCount, addToCart } from './cart.js';
+
+/**
+ * Main function to fetch product data from the API based on URL ID and render the details.
+ * @async
+ * @function
+ * @throws {Error} If Product ID is missing in the URL or the product is not found.
+ */
+async function renderProductDetails() {
+    
+    updateCartCount();
+
+    const container = document.getElementById('product-detail-container');
+    if (!container) {
+        console.error('Product detail container not found.');
+        return;
+    }
+
+    // This variable will hold the current quantity
+    let currentQuantity = 1;
+    // This variable will hold the full product data
+    let currentProduct = null;
+
+    try {
+        // 1. Get the ID from the URL
+        const params = new URLSearchParams(window.location.search);
+        const productId = parseInt(params.get('id'));
+
+        if (!productId) {
+            throw new Error('Product ID not found in URL.');
+        }
+
+        // 2. Make an API request for the single product
+        const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) {
+            throw new Error(`Product not found (status: ${response.status})`);
+        }
+        
+        // 3. Get the product data
+        const product = await response.json();
+        currentProduct = product; // Save product for later
+
+        // 4. (NEW) Populate the HTML with the new Figma structure
+        container.innerHTML = `
+            &lt;div class="details-layout">
+                &lt;div class="details-image-column">
+                    &lt;img src="${product.image}" alt="${product.name}" class="product-image-large">
+                &lt;/div>
+
+                &lt;div class="details-info-column">
+                    &lt;h1>${product.name}&lt;/h1>
+                    
+                    &lt;p class="detail-label">COLOR&lt;/p>
+                    &lt;p class="detail-value">${product.mainColor || 'N/A'}&lt;/p>
+                    
+                    &lt;p class="detail-label">SEASON&lt;/p>
+                    &lt;p class="detail-value">${product.season || 'N/A'}&lt;/p>
+
+                    &lt;p class="detail-label">DESCRIPTION&lt;/p>
+                    &lt;p class="detail-value">${product.description}&lt;/p>
+                    
+                    &lt;p class="product-price">${product.price} грн&lt;/p>
+
+                    &lt;div class="quantity-selector">
+    &lt;button class="quantity-btn" id="decrease-qty">
+        &lt;img src="/images/left.svg" alt="Decrease">
+    &lt;/button>
+    &lt;span id="quantity-display">${currentQuantity}&lt;/span>
+    &lt;button class="quantity-btn" id="increase-qty">
+        &lt;img src="/images/right.svg" alt="Increase">
+    &lt;/button>
+&lt;/div>
+
+                    &lt;button class="add-to-cart-btn" id="add-to-cart-detail-btn">ADD TO CART&lt;/button>
+                &lt;/div>
+            &lt;/div>
+        `;
+
+        // 5. (NEW) Add handlers for quantity buttons
+        const increaseBtn = document.getElementById('increase-qty');
+        const decreaseBtn = document.getElementById('decrease-qty');
+        const quantityDisplay = document.getElementById('quantity-display');
+
+        increaseBtn.addEventListener('click', () => {
+            currentQuantity++;
+            quantityDisplay.textContent = currentQuantity;
+        });
+
+        decreaseBtn.addEventListener('click', () => {
+            if (currentQuantity > 1) { // Don't go below 1
+                currentQuantity--;
+                quantityDisplay.textContent = currentQuantity;
+            }
+        });
+
+        // 6. (UPDATED) Add handler for the "Add to Cart" button
+        const detailButton = document.getElementById('add-to-cart-detail-btn');
+        if (detailButton) {
+            detailButton.addEventListener('click', () => {
+              const cartProduct = {
+                    getId: () => currentProduct.id,
+                    getName: () => currentProduct.name,
+                    getPrice: () => currentProduct.price,
+                    // (NEW) Ми додаємо метод getImage
+                    getImage: () => currentProduct.image, 
+                    quantity: currentQuantity
+                };
+                
+                // Call the modified addToCart function
+                addToCart(cartProduct, currentQuantity); 
+            });
+        }
+
+    } catch (error) {
+        console.error('Failed to render product details:', error);
+        container.innerHTML = '&lt;h1>Товар не знайдено&lt;/h1>&lt;p>Помилка завантаження. Будь ласка, поверніться до магазину.&lt;/p>';
+    }
+}
+
+// Run the function after the page loads
+document.addEventListener('DOMContentLoaded', renderProductDetails);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

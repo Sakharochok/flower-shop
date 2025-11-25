@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/js/checkout.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/js/checkout.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Module handling the checkout process and integration with backend entities.
+ * @module checkout
+ */
+import { Cart } from './cart.js';
+import { updateCartCount } from './cart.js';
+import { User, Order, Payment } from '/entities/entities.js';
+
+
+const cart = new Cart();
+
+/**
+ * Main function to initialize the checkout page and handle form submission.
+ * @function
+ */
+function initializeCheckout() {
+    updateCartCount();
+    const summaryTotalEl = document.getElementById('summary-total');
+    const checkoutForm = document.getElementById('checkout-form');
+    const formMessageEl = document.getElementById('form-message');
+
+    const total = cart.getTotalPrice();
+    if (summaryTotalEl) {
+        summaryTotalEl.textContent = `${total} UAH`; // (TRANSLATED)
+    }
+
+    if (!checkoutForm) {
+        console.error("Checkout form element not found.");
+        return;
+    }
+
+    checkoutForm.addEventListener('submit', (e) => {
+        e.preventDefault(); 
+        
+        formMessageEl.textContent = '';
+        formMessageEl.style.color = 'black';
+
+        if (cart.getTotalItemsCount() === 0) {
+            formMessageEl.textContent = 'Your cart is empty.'; // (TRANSLATED)
+            formMessageEl.style.color = 'red';
+            return;
+        }
+
+        try {
+            const formData = new FormData(checkoutForm);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const address = formData.get('address');
+            const paymentMethod = formData.get('payment-method');
+            
+            const user = new User(1, name, email);
+            const addressSet = user.setShippingAddress(address);
+
+            if (!addressSet) {
+                 throw new Error('Address must be longer than 5 characters.'); // (TRANSLATED)
+            }
+
+            const order = new Order(101, user);
+            cart.getItems().forEach(item => order.addItem(item));
+            const orderTotal = order.calculateTotal();
+
+            const payment = new Payment(201, orderTotal, paymentMethod);
+            payment.processPayment();
+            
+            console.log('Order successfully processed:', {
+                user: user.getName(),
+                address: user.getShippingAddress(),
+                total: orderTotal,
+                isPaid: payment.isPaid()
+            });
+
+            formMessageEl.textContent = `Thank you, ${user.getName()}! Your order #${order.getOrderId()} for ${orderTotal} UAH has been processed.`;
+            formMessageEl.style.color = 'green';
+            
+            checkoutForm.querySelector('button').disabled = true;
+        } catch (error) {
+            console.error('Checkout failed:', error.message);
+            formMessageEl.textContent = `Error: ${error.message}`; 
+            formMessageEl.style.color = 'red';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initializeCheckout);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

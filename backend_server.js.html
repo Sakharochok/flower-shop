@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/server.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/server.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Main Express server application file.
+ * Handles API endpoints, static file serving, and core business logic execution.
+ * @module server
+ */
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.join(__dirname, '..');
+
+// (FIX) We import 'products' FIRST
+import { products, Bouquet, Flower, DecorItem } from './data/products/products.js';
+import { User } from './data/entities/User.js';
+import { Order } from './data/entities/Order.js';
+import { Payment } from './data/entities/Payment.js';
+import { NovaPoshtaShipping } from './data/entities/Shipping.js';
+
+// (FIX) We import the FUNCTION, not the graph itself
+import { createMasterGraph } from './utils/compatibilityGraph.js';
+
+// (FIX) We create the graph HERE, after 'products' is loaded
+const compatibilityGraph = createMasterGraph(products);
+
+const app = express();
+const PORT = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+app.use(express.static(path.join(projectRoot, 'frontend')));
+app.use('/images', express.static(path.join(projectRoot, 'images')));
+app.use('/entities', express.static(path.join(projectRoot, 'backend/data/entities')));
+
+/**
+ * Helper function to transform complex product objects (class instances) 
+ * into simple Data Transfer Objects (DTOs) for API response.
+ * @function
+ * @param {Object} product - An instance of a product class (Flower, Bouquet, etc.).
+ * @returns {Object} A simplified object containing key product data.
+ */
+// === "Hydration" Helper Function ===
+function hydrateProduct(product) {
+    const data = {
+        id: product.getId(),
+        name: product.getName(),
+        price: product.getPrice(),
+        image: product.getImage(),
+        description: product.getDescription(),
+        isPricy: product.isPricy(),
+        type: 'ShopItem'
+    };
+
+    if (typeof product.isSuitableForTallVase === 'function') {
+        data.type = 'Flower';
+        data.isSuitableForTallVase = product.isSuitableForTallVase();
+    } else if (typeof product.addFlower === 'function') {
+        data.type = 'Bouquet';
+        data.mainColor = product.getMainColor();
+        data.season = product.getSeason();
+    } else if (product.constructor.name === 'DecorItem') {
+        data.type = 'DecorItem';
+    }
+    
+    return data;
+}
+
+// === API Endpoints ===
+// Documentation for routes is typically done via tools like Swagger, 
+// but we add brief comments for context here.
+
+// app.get('/api/products', ...) - Returns all products.
+// app.get('/api/products/:id', ...) - Returns a single product by ID.
+// app.post('/api/order', ...) - Processes a new customer order.
+// app.post('/api/build-bouquet', ...) - Calculates assembly cost using graph algorithms.
+// === END OF FUNCTION ===
+
+
+// === API Endpoints ===
+app.get('/api/products', (req, res) => {
+    const hydratedProducts = products.map(hydrateProduct); 
+    res.json(hydratedProducts);
+});
+
+app.get('/api/products/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const product = products.find(p => p.getId() === id);
+    if (product) {
+        res.json(hydrateProduct(product)); 
+    } else {
+        res.status(404).json({ error: 'Product not found' });
+    }
+});
+
+app.get('/api/components', (req, res) => {
+    const flowers = products.filter(p => {
+        return typeof p.isSuitableForTallVase === 'function';
+    });
+    const hydratedFlowers = flowers.map(hydrateProduct); 
+    res.json(hydratedFlowers);
+});
+
+app.post('/api/order', (req, res) => {
+    const orderData = req.body;
+    try {
+        if (!orderData || !orderData.items || !orderData.user) {
+            return res.status(400).json({ error: 'Empty or incorrect order data' });
+        }
+        const user = new User(Date.now(), orderData.user.name, orderData.user.email);
+        const addressSet = user.setShippingAddress(orderData.user.address);
+        if (!addressSet) { throw new Error('Address must be longer than 5 characters.'); }
+        
+        const order = new Order(Date.now() + 1, user);
+        orderData.items.forEach(item => order.addItem(item));
+        const orderTotal = order.calculateTotal();
+        
+        const shipping = new NovaPoshtaShipping(1, user.getShippingAddress(), 1);
+        const shippingCost = shipping.calculateCost();
+        const finalTotal = orderTotal + shippingCost;
+        
+        const payment = new Payment(Date.now() + 2, finalTotal, orderData.paymentMethod);
+        payment.processPayment();
+        const trackingNumber = shipping.generateTrackingNumber();
+
+        res.status(201).json({
+            success: true,
+            message: 'Order processed successfully!',
+            orderId: order.getOrderId(),
+            customerName: user.getName(),
+            welcomeMessage: user.generateWelcomeMessage(),
+            totalPaid: finalTotal,
+            shippingCost: shippingCost,
+            trackingNumber: trackingNumber,
+            status: order.getStatus()
+        });
+    } catch (error) {
+        console.error('Order processing failed:', error.message);
+        res.status(400).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/build-bouquet', (req, res) => {
+     const { componentNames } = req.body;
+     if (!componentNames || componentNames.length &lt; 2) {
+        return res.status(400).json({ success: false, error: 'Bouquet must have at least 2 components.' });
+     }
+     try {
+        const components = products.filter(p => componentNames.includes(p.getName()));
+        const tempBouquet = new Bouquet(999, 'Temp Builder', 0, '', components);
+        const result = tempBouquet.findOptimalFlowerConnections(compatibilityGraph, 'Kruskal');
+        
+        res.status(200).json({
+            success: true,
+            assemblyCost: result.weight,
+            connections: result.mst.length,
+            algorithm: result.algorithm
+        });
+     } catch (error) {
+        console.error('Bouquet build error:', error.message);
+        res.status(500).json({ success: false, error: 'Error processing bouquet logic.' });
+     }
+});
+
+// --- Catch-all for HTML5 routing ---
+app.get(['/', '/index.html'], (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'index.html'));
+});
+app.get('/cart.html', (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'cart.html'));
+});
+app.get('/details.html', (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'details.html'));
+});
+app.get('/checkout.html', (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'checkout.html'));
+});
+app.get('/builder.html', (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'builder.html'));
+});
+app.get('/products.html', (req, res) => {
+    res.sendFile(path.join(projectRoot, 'frontend', 'products.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running. Frontend accessible at http://localhost:${PORT}`);
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

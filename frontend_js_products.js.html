@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/js/products.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/js/products.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Module for the Product Catalog page, handling category-specific display and filtering.
+ * @module products
+ */
+import { updateCartCount } from './cart.js';
+
+// DOM Elements
+const productListContainer = document.getElementById('product-list');
+const emptyMessage = document.getElementById('products-empty-message');
+const categoryHeading = document.getElementById('category-heading');
+const seasonalBtn = document.getElementById('seasonal-filter-btn');
+const searchInput = document.getElementById('search-input');
+const filterToggleBtn = document.getElementById('other-filter-btn'); 
+const advancedFilterPanel = document.getElementById('advanced-filters');
+const minPriceInput = document.getElementById('min-price');
+const maxPriceInput = document.getElementById('max-price');
+
+// --- Global State Variables ---
+let allBouquetsInCategory = [];
+let currentCategory = 'All';
+
+let currentFilters = {
+    color: 'All',
+    season: 'All-Year',
+    search: '',
+    minPrice: 0,
+    maxPrice: 9999
+};
+
+/**
+ * Applies filters (color, season, price, search) to the category-specific bouquet list.
+ * @function
+ */
+function applyFilters() {
+    let filteredBouquets = allBouquetsInCategory;
+    
+    // ... (Filter logic remains the same) ...
+    if (currentFilters.color !== 'All') {
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.mainColor === currentFilters.color
+        );
+    }
+    if (currentFilters.season !== 'All-Year') {
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.season !== 'All-Year' 
+        );
+    }
+    if (currentFilters.search) {
+        const lowerCaseSearch = currentFilters.search.toLowerCase();
+        filteredBouquets = filteredBouquets.filter(bouquet => 
+            bouquet.name.toLowerCase().includes(lowerCaseSearch) 
+        );
+    }
+    filteredBouquets = filteredBouquets.filter(bouquet => {
+        const price = bouquet.price;
+        return price >= currentFilters.minPrice &amp;&amp; price &lt;= currentFilters.maxPrice;
+    });
+
+    renderProductList(filteredBouquets);
+}
+
+function renderProductList(bouquetsToRender) {
+    if (!productListContainer || !emptyMessage) return;
+    
+    productListContainer.innerHTML = ''; 
+
+    if (bouquetsToRender.length === 0) {
+        emptyMessage.textContent = 'No products found for this filter.'; // (TRANSLATED)
+        emptyMessage.style.display = 'block';
+    } else {
+        emptyMessage.style.display = 'none';
+        bouquetsToRender.forEach(product => {
+            const cardElement = renderProductCard(product);
+            productListContainer.appendChild(cardElement);
+        });
+    }
+}
+
+function renderProductCard(product) {
+    const card = document.createElement('div');
+    card.className = 'product-card-simple'; 
+    card.innerHTML = `
+        &lt;a href="details.html?id=${product.id}" class="product-link-simple">
+            &lt;img src="${product.image}" alt="${product.name}" class="product-image-simple">
+            &lt;h3>${product.name}&lt;/h3>
+        &lt;/a>
+    `;
+    return card;
+}
+
+/**
+ * Fetches products, determines the category from URL, and initializes the list.
+ * @async
+ * @function
+ * @throws {Error} If category is missing or fetching from API fails.
+ */
+async function fetchAndInitialize() {
+    if (!productListContainer) return;
+
+    try {
+        const params = new URLSearchParams(window.location.search);
+        currentCategory = params.get('category');
+        
+        if (!currentCategory) {
+            throw new Error('Category not specified in URL.'); // (TRANSLATED)
+        }
+
+        if (categoryHeading) categoryHeading.textContent = currentCategory;
+
+        const singularLookup = {
+            'Roses': 'Rose',
+            'Lilies': 'Lily',
+            'Peonies': 'Peony'
+        };
+        const singularCategory = singularLookup[currentCategory] || currentCategory;
+
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const allProducts = await response.json();
+        
+        allBouquetsInCategory = allProducts.filter(p => {
+            if (p.type !== 'Bouquet') return false;
+            const nameLower = p.name.toLowerCase();
+            if (p.season === currentCategory) return true;
+            if (nameLower.includes(currentCategory.toLowerCase())) return true;
+            if (nameLower.includes(singularCategory.toLowerCase())) return true;
+            return false;
+        });
+        
+        applyFilters();
+
+    } catch (error) {
+        console.error('Failed to fetch products:', error);
+        productListContainer.innerHTML = '';
+        emptyMessage.textContent = `Error loading products: ${error.message}`; // (TRANSLATED)
+        emptyMessage.style.display = 'block';
+        if (categoryHeading) categoryHeading.textContent = 'Error'; // (TRANSLATED)
+    }
+}
+
+// ... (All setup...Listener functions remain unchanged) ...
+function setupColorFilterListeners() {
+    const colorDots = document.querySelectorAll('.color-dot');
+    colorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const clickedColor = dot.dataset.color;
+            if (currentFilters.color === clickedColor) {
+                currentFilters.color = 'All';
+                dot.style.border = 'none';
+            } else {
+                currentFilters.color = clickedColor;
+                colorDots.forEach(d => d.style.border = 'none');
+                dot.style.border = '2px solid #EFC1CF';
+            }
+            applyFilters();
+        });
+    });
+}
+function setupSeasonalFilterListener() {
+    if (!seasonalBtn) return; 
+    seasonalBtn.addEventListener('click', () => {
+        if (currentFilters.season === 'All-Year') {
+            currentFilters.season = 'Seasonal';
+            seasonalBtn.style.backgroundColor = '#DBB0C0';
+            seasonalBtn.style.color = 'white';
+        } else {
+            currentFilters.season = 'All-Year';
+            seasonalBtn.style.backgroundColor = '#EFC1CF';
+            seasonalBtn.style.color = 'white';
+        }
+        applyFilters();
+    });
+}
+function setupSearchFilterListener() {
+    if (!searchInput) return;
+    searchInput.addEventListener('input', () => {
+        currentFilters.search = searchInput.value;
+        applyFilters();
+    });
+}
+function setupAdvancedFilterListener() {
+    if (filterToggleBtn) {
+        filterToggleBtn.addEventListener('click', () => {
+            const isHidden = advancedFilterPanel.style.display === 'none';
+            advancedFilterPanel.style.display = isHidden ? 'flex' : 'none';
+        });
+    }
+    if (minPriceInput) {
+        minPriceInput.addEventListener('input', () => {
+            currentFilters.minPrice = parseFloat(minPriceInput.value) || 0;
+            applyFilters();
+        });
+    }
+    if (maxPriceInput) {
+        maxPriceInput.addEventListener('input', () => {
+            currentFilters.maxPrice = parseFloat(maxPriceInput.value) || 9999;
+            applyFilters();
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
+    fetchAndInitialize();
+    setupColorFilterListeners();
+    setupSeasonalFilterListener();
+    setupSearchFilterListener();
+    setupAdvancedFilterListener();
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

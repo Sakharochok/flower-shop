@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/data/products/products.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/data/products/products.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// backend/data/products/products.js
+
+/**
+ * Module aggregator for all shop products and product-related classes.
+ * Contains the main array of all available products.
+ * @module products
+ */
+import { ShopItem } from './ShopItem.js';
+import { Flower } from './Flower.js';
+import { Bouquet } from './Bouquet.js';
+import { DecorItem } from './DecorItem.js';
+import { Store } from './Store.js'; 
+import { SpecialBouquet } from './SpecialBouquet.js';
+
+// =========================================================================
+// PRODUCTS ARRAY
+// =========================================================================
+
+/**
+ * Array of all available products in the shop.
+ * Contains instances of Flower, Bouquet, DecorItem, etc.
+ * @type {Array&lt;ShopItem>}
+ */
+const products = [
+    
+    // === 1. BUILDER COMPONENTS (SINGLE FLOWERS with .png) ===
+    // (These are identified by 'isSuitableForTallVase' method)
+    
+    new Flower(1, "Pink Rose (builder)", 60, "/images/1pinkRose.png", "Pink", 50),
+    new Flower(2, "Red Rose (builder)", 65, "/images/1redRose.png", "Red", 55),
+    new Flower(3, "White Rose (builder)", 55, "/images/1whiteRose.png", "White", 50),
+    new Flower(10, "Pink Tulip (builder)", 40, "/images/1pinkTulip.png", "Pink", 40),
+    new Flower(11, "Red Tulip (builder)", 45, "/images/1redTulip.png", "Red", 45),
+    new Flower(12, "White Tulip (builder)", 38, "/images/1whiteTulip.png", "White", 40),
+    new Flower(20, "Pink Lily (builder)", 70, "/images/1pinkLily.png", "Pink", 60),
+    new Flower(21, "White Lily (builder)", 65, "/images/1whiteLily.png", "White", 60),
+    new Flower(30, "Pink Gerbera (builder)", 50, "/images/1pinkGerbera.png", "Pink", 45),
+    new Flower(40, "Sunflower (builder)", 55, "/images/1sunflower.png", "Yellow", 50),
+
+    // === 2. BOUQUETS (MAIN PAGE with .jpg) ===
+    // (These are identified as 'Bouquet' class)
+    // constructor(id, name, price, image, flowers, mainColor, season)
+    
+    // Original Bouquets
+    new Bouquet(100, "101 Roses", 5500, "/images/100&amp;1roses.jpg", [], 'Pink', 'All-Year'),
+    new Bouquet(101, "Bouquet of Gerberas", 750, "/images/bouquetOfGerberas.jpg", [], 'Pink', 'Summer'),
+    new Bouquet(102, "Bouquet of Lilies", 800, "/images/bouquetOfLilies.jpg", [], 'Pink', 'Summer'),
+    new Bouquet(103, "Bouquet of Peonies", 1200, "/images/bouquetOfPeonies.jpg", [], 'Pink', 'Spring'),
+    new Bouquet(104, "Spring Bouquet", 950, "/images/springBouquet.jpg", [], 'Mixed', 'Spring'),
+
+    // New Bouquets from your screenshot
+    new Bouquet(105, "Pink Rose Bouquet", 900, "/images/pinkRose.jpg", [], 'Pink', 'All-Year'),
+    new Bouquet(106, "Red Rose Bouquet", 950, "/images/redRose.jpg", [], 'Red', 'All-Year'),
+    new Bouquet(107, "White Rose Bouquet", 850, "/images/whiteRose.jpg", [], 'White', 'All-Year'),
+    new Bouquet(108, "Pink Tulip Bouquet", 700, "/images/pinkTulip.jpg", [], 'Pink', 'Spring'),
+    new Bouquet(109, "Red Tulip Bouquet", 750, "/images/redTulip.jpg", [], 'Red', 'Spring'),
+    new Bouquet(110, "White Tulip Bouquet", 650, "/images/whiteTulip.jpg", [], 'White', 'Spring'),
+    new Bouquet(111, "Pink Lily Bouquet", 1000, "/images/pinkLily.jpg", [], 'Pink', 'Summer'),
+    new Bouquet(112, "White Lily Bouquet", 980, "/images/whiteLily.jpg", [], 'White', 'Summer'),
+    new Bouquet(113, "Pink Gerbera Bouquet", 600, "/images/pinkGerbera.jpg", [], 'Pink', 'Summer'),
+    new Bouquet(114, "Orange Gerbera Bouquet", 620, "/images/orangeGerbera.jpg", [], 'Orange', 'Summer'),
+    new Bouquet(115, "Sunflower Bouquet", 780, "/images/sunflower.jpg", [], 'Orange', 'Autumn')
+];
+
+// --- AGGREGATED EXPORT ---
+export { 
+    products, 
+    ShopItem, 
+    Flower, 
+    Bouquet, 
+    DecorItem, 
+    Store,
+    SpecialBouquet 
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

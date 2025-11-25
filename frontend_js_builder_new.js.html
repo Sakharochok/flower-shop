@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/js/builder_new.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/js/builder_new.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Module for the Bouquet Builder.
+ * Handles drag-and-drop, graph calculation, and adding the custom bouquet to the cart.
+ * @module builder_new
+ */
+import { updateCartCount, addToCart } from './cart.js';
+
+let lastCalculatedBouquetPrice = 0;
+let bouquetNameCounter = 1;
+
+const availableItemsList = document.getElementById('available-items-list');
+const dropZone = document.getElementById('drop-zone');
+const bouquetPlaceholder = document.getElementById('bouquet-placeholder');
+const calculateBtn = document.getElementById('calculate-btn');
+const resultDisplay = document.getElementById('result-display');
+const addBouquetToCartBtn = document.getElementById('add-bouquet-to-cart-btn');
+
+let allComponents = []; 
+let currentBouquetItems = []; 
+let dropCounter = 0;
+
+/**
+ * Fetches the available flower components from the API.
+ * @async
+ * @function
+ * @throws {Error} If fetching components fails.
+ */
+async function fetchComponents() {
+    if (!availableItemsList) return;
+
+    try {
+        const response = await fetch('/api/components'); 
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        allComponents = await response.json();
+        renderAvailableItems();
+        
+    } catch (error) {
+        console.error('Failed to fetch components:', error);
+        availableItemsList.innerHTML = '&lt;p>Error loading components.&lt;/p>'; // (TRANSLATED)
+    }
+}
+
+function renderAvailableItems() {
+    availableItemsList.innerHTML = '';
+    allComponents.forEach(item => {
+        const itemElement = createItemElement(item);
+        itemElement.draggable = true;
+        itemElement.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('application/json', JSON.stringify(item));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+        availableItemsList.appendChild(itemElement);
+    });
+}
+
+function createItemElement(item) {
+    const itemElement = document.createElement('div');
+    itemElement.className = 'builder-item';
+    itemElement.innerHTML = `
+        &lt;img src="${item.image}" alt="${item.name}">
+        &lt;div class="item-info">
+            &lt;h4>${item.name}&lt;/h4>
+            &lt;p>${item.price} UAH&lt;/p> &lt;/div>
+    `;
+    return itemElement;
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    dropZone.classList.add('drag-over'); 
+}
+
+function handleDragLeave(e) {
+    dropZone.classList.remove('drag-over');
+}
+/**
+ * Handles the drop event, adds the flower to the bouquet, and updates the display.
+ * @function
+ * @param {DragEvent} e - The drag event.
+ */
+function handleDrop(e) {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (bouquetPlaceholder) {
+        bouquetPlaceholder.style.display = 'none';
+    }
+    if (addBouquetToCartBtn) addBouquetToCartBtn.style.display = 'none';
+
+    const item = JSON.parse(e.dataTransfer.getData('application/json'));
+    
+    dropCounter++;
+    const currentDropId = dropCounter;
+    currentBouquetItems.push({
+        dropId: currentDropId,
+        name: item.name 
+    });
+
+    const img = document.createElement('img');
+    img.src = item.image;
+    img.className = 'dropped-item';
+    img.dataset.dropId = currentDropId;
+    img.addEventListener('click', handleDeleteItem);
+
+    const dropZoneRect = dropZone.getBoundingClientRect();
+    const x = e.clientX - dropZoneRect.left - 40;
+    const y = e.clientY - dropZoneRect.top - 40;
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
+    dropZone.appendChild(img);
+
+    if (currentBouquetItems.length >= 2) {
+        calculateBtn.disabled = false;
+    }
+    resultDisplay.innerHTML = '';
+}
+
+function handleDeleteItem(e) {
+    const imgToDelete = e.target;
+    const dropIdToDelete = parseInt(imgToDelete.dataset.dropId);
+
+    imgToDelete.remove();
+    if (addBouquetToCartBtn) addBouquetToCartBtn.style.display = 'none';
+
+    currentBouquetItems = currentBouquetItems.filter(item => {
+        return item.dropId !== dropIdToDelete;
+    });
+
+    if (currentBouquetItems.length &lt; 2) {
+        calculateBtn.disabled = true;
+        resultDisplay.innerHTML = '';
+    }
+    
+    if (currentBouquetItems.length === 0 &amp;&amp; bouquetPlaceholder) {
+        bouquetPlaceholder.style.display = 'block';
+    }
+}
+
+/**
+ * Calculates the assembly cost of the current bouquet by making a POST request to the API.
+ * @async
+ * @function
+ * @throws {Error} If the bouquet has less than two components or the API call fails.
+ */
+async function handleCalculateClick() {
+    if (currentBouquetItems.length &lt; 2) return;
+
+    calculateBtn.disabled = true;
+    calculateBtn.textContent = 'Calculating...'; // (TRANSLATED)
+    resultDisplay.innerHTML = '';
+    if (addBouquetToCartBtn) addBouquetToCartBtn.style.display = 'none';
+
+    const componentNames = currentBouquetItems.map(item => item.name);
+    const numberOfFlowers = currentBouquetItems.length;
+    const totalFlowerPrice = currentBouquetItems.reduce((sum, bouquetItem) => {
+        const component = allComponents.find(c => c.name === bouquetItem.name);
+        if (component) {
+            return sum + component.price;
+        }
+        return sum;
+    }, 0);
+
+    try {
+        const response = await fetch('/api/build-bouquet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ componentNames: componentNames }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || 'Unknown server error');
+        }
+        
+        const assemblyCost = result.assemblyCost;
+        const complexityCharge = assemblyCost * numberOfFlowers;
+        const finalBouquetPrice = totalFlowerPrice + complexityCharge;
+
+        resultDisplay.style.color = '#370017';
+        
+        resultDisplay.innerHTML = `
+            Assembly complexity: &lt;b>${assemblyCost} / 10&lt;/b>
+            &lt;br>
+            &lt;span style="font-size: 0.8em;">(based on ${result.connections} connections)&lt;/span> &lt;hr style="border:0; border-top: 1px solid #eee; margin: 10px 0;">
+            &lt;b>Flower cost:&lt;/b> ${totalFlowerPrice} UAH &lt;br>
+            &lt;b>Complexity charge:&lt;/b> ${complexityCharge} UAH &lt;br>
+            &lt;h3 style="margin-top: 10px; margin-bottom: 0;">Total cost: ${finalBouquetPrice} UAH&lt;/h3> `;
+        
+        lastCalculatedBouquetPrice = finalBouquetPrice;
+        if (addBouquetToCartBtn) addBouquetToCartBtn.style.display = 'block';
+
+    } catch (error) {
+        console.error('Calculation failed:', error.message);
+        resultDisplay.style.color = 'red';
+        resultDisplay.textContent = `Error: ${error.message}`; // (TRANSLATED)
+    }
+
+    calculateBtn.disabled = false;
+    calculateBtn.textContent = 'Calculate Bouquet Cost'; // (TRANSLATED)
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
+    fetchComponents(); 
+    
+    if (calculateBtn) {
+        calculateBtn.addEventListener('click', handleCalculateClick);
+    }
+    if (dropZone) {
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+    }
+    
+    if (addBouquetToCartBtn) {
+        addBouquetToCartBtn.addEventListener('click', () => {
+            if (lastCalculatedBouquetPrice > 0) {
+                const bouquetName = `My Bouquet #${bouquetNameCounter}`; // (TRANSLATED)
+                
+                const bouquetProduct = {
+                    getId: () => `builder-${Date.now()}`,
+                    getName: () => bouquetName,
+                    getPrice: () => lastCalculatedBouquetPrice,
+                    getImage: () => '/images/bunch.svg' 
+                };
+
+                addToCart(bouquetProduct, 1);
+                bouquetNameCounter++;
+                
+                addBouquetToCartBtn.style.display = 'none';
+                dropZone.innerHTML = '&lt;p id="bouquet-placeholder">Drag flowers here&lt;/p>'; // (TRANSLATED)
+                calculateBtn.disabled = true;
+                resultDisplay.innerHTML = '';
+                lastCalculatedBouquetPrice = 0;
+                currentBouquetItems = [];
+            } else {
+                alert('Please calculate the bouquet cost first.'); // (TRANSLATED)
+            }
+        });
+    }
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-builder_new.html">builder_new</a></li><li><a href="module-checkout.html">checkout</a></li><li><a href="module-details.html">details</a></li><li><a href="module-entities.html">entities</a></li><li><a href="module-main.html">main</a></li><li><a href="module-polymorphism-example.html">polymorphism-example</a></li><li><a href="module-products.html">products</a></li><li><a href="module-server.html">server</a></li></ul><h3>Classes</h3><ul><li><a href="Bouquet.html">Bouquet</a></li><li><a href="Bouquet_ShopItem.html">ShopItem</a></li><li><a href="Cart.html">Cart</a></li><li><a href="DecorItem.html">DecorItem</a></li><li><a href="DecorItem_ShopItem.html">ShopItem</a></li><li><a href="Flower.html">Flower</a></li><li><a href="Flower_ShopItem.html">ShopItem</a></li><li><a href="Graph.html">Graph</a></li><li><a href="Order.html">Order</a></li><li><a href="Order_Order.html">Order</a></li><li><a href="Payment.html">Payment</a></li><li><a href="Payment_Payment.html">Payment</a></li><li><a href="Shipping_Shipping.html">Shipping</a></li><li><a href="ShopItem.html">ShopItem</a></li><li><a href="ShopItem_ShopItem.html">ShopItem</a></li><li><a href="SpecialBouquet.html">SpecialBouquet</a></li><li><a href="SpecialBouquet_ShopItem.html">ShopItem</a></li><li><a href="Store.html">Store</a></li><li><a href="User.html">User</a></li><li><a href="User_User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addToCart">addToCart</a></li><li><a href="global.html#createMasterGraph">createMasterGraph</a></li><li><a href="global.html#updateCartCount">updateCartCount</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Nov 25 2025 10:57:33 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
