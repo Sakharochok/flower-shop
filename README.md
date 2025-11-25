@@ -48,4 +48,4 @@ The project features 3 container elements that are dynamically populated with da
 
 There are well over 15 event handlers implemented (exceeding the minimum of 10). The application responds to DOMContentLoaded, click (for all buttons and filters), input (for search and price fields), dragstart, dragover, dragleave, drop (for the bouquet builder), and submit (for the checkout form).
 
-Finally, the project maintains a strict separation of logic and GUI. The frontend JavaScript files are responsible only for handling user events and rendering data. All business logic, such as price calculations, bouquet complexity analysis (kruskalMST), and order processing, is handled exclusively by the backend classes and server.
+Finally, the project maintains a strict separation of logic and GUI. The frontend JavaScript files are responsible only for handling user events and rendering data. All business logic,  such as price calculations, bouquet complexity analysis (kruskalMST), and order processing, is handled exclusively by the backend classes and server.
