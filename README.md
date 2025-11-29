@@ -1,57 +1,145 @@
-🌸 Flower Shop OOP Project
-This is a full-stack web application for an online flower shop, created as a project for the "Object-Oriented Programming Basics" course. The project consists of a Node.js backend that provides a REST API and a vanilla JavaScript frontend that implements the graphical user interface.
+# 🌸 Flower Shop Project
 
-Project Requirements Compliance Report
-This project was developed to meet the specifications outlined in the "General Requirements" and "Lab 2: GUI" documents.
+**Flower Shop** is a full-stack web application for an online flower shop, developed as a capstone project for the "Basics of Object-Oriented Programming" course.
 
-General Requirements (0.general-requirements.docx)
-The project successfully implements all major general requirements for the course.
+The project combines classic e-commerce functionality, strict object-oriented architecture, and the use of graph theory algorithms to calculate bouquet complexity.
 
-The OOP design is central to the application. The codebase makes extensive use of OOP principles, including encapsulation (using private fields # in classes), inheritance (e.g., ShopItem as a base class for Bouquet and Flower), polymorphism (e.g., the getDescription() method), and abstraction (e.g., the Shipping base class).
+---
 
-The code is strictly separated by concern. The backend directory contains all business logic, data classes (entities, products), and the API server, while the frontend directory contains all GUI-related code (HTML, CSS, and client-side JavaScript). The project runs as a single program (node backend/server.js), which serves both the API and the static frontend files.
+## 📋 Table of Contents
+1. [Lab 1: OOP Basics](#1-lab-1-oop-basics)
+2. [Lab 2: Graphical User Interface (GUI)](#2-lab-2-graphical-user-interface-gui)
+3. [Lab 3: External Libraries](#3-lab-3-external-libraries)
+4. [Academic Project](#4-academic-project)
+5. [Documentation](#5-documentation)
+6. [Installation & Setup](#-installation--setup)
+7. [Project Structure](#-project-structure)
 
+---
 
+## 1. Lab 1: OOP Basics
+*Implementation of Encapsulation, Inheritance, and Polymorphism requirements.*
 
-Modern software engineering practices have been followed. Source control (Git) was used throughout the development process, with regular commits to a remote GitHub repository. Unit tests are included (tests/oop-tests.js) to verify core class functionality, which is a mandatory requirement for the highest evaluation. Internationalization (i18n) has been implemented, with the entire frontend UI and all backend server responses being translated to and displayed in English.
+The project implements a strict OOP architecture:
 
+* **Classes & Objects:** Over **12 classes** implemented (minimum requirement: 9).
+    * *Entities:* `User`, `Order`, `Payment`, `Shipping`.
+    * *Products:* `ShopItem`, `Flower`, `DecorItem`, `Bouquet`, `SpecialBouquet`.
+    * *Utils:* `Graph`, `Store`.
+* **Encapsulation:** All classes utilize private fields (`#price`, `#items`, `#status`). Access is controlled via getters and validation methods (e.g., `User.setShippingAddress` validates string length).
+* **Inheritance (Hierarchies):**
+    1.  `ShopItem` (Base) → `Flower`, `DecorItem`, `Bouquet`.
+    2.  `Bouquet` → `SpecialBouquet` (Deep hierarchy, 3 levels).
+    3.  `Shipping` (Abstract) → `NovaPoshtaShipping`.
+* **Polymorphism:**
+    * **Dynamic:** The `getDescription()` method is overridden in `Flower`, `DecorItem`, and `SpecialBouquet` classes. The `calculateCost()` method is overridden in `NovaPoshtaShipping`.
+    * **Static (Generics Simulation):** The `Store` class implements a container that accepts only objects inheriting from `ShopItem` (using `instanceof` checks).
+* **Non-trivial Methods:** Over 25 complex methods implemented, including `findOptimalFlowerConnections` (graph algorithm), `processPayment`, and `updateStatus`.
 
+---
 
+## 2. Lab 2: Graphical User Interface (GUI)
+[cite_start]*Implementation of interactive user interaction [cite: 98-101].*
 
+The interface is decoupled from business logic (Frontend in `frontend/`, Backend in `backend/`).
 
-The project also leverages external libraries, with express and cors being used in the backend to build the REST API. Error handling is implemented on both the server-side (using try...catch blocks in API endpoints) and the client-side (handling fetch promises and form validation). Finally, the project defines clear interfaces, including a Web GUI for users and a REST API for programmatic access.
+* **Screens (Forms/Windows):** **6 pages** implemented (minimum requirement: 4):
+    1.  `index.html` (Home)
+    2.  `products.html` (Catalog with filters)
+    3.  `details.html` (Product Details)
+    4.  `cart.html` (Shopping Cart)
+    5.  `checkout.html` (Order Checkout)
+    6.  `builder.html` (Bouquet Builder)
+* **Controls:** Over **25 elements** used (minimum requirement: 20):
+    * Filters: by color (radio buttons), seasonality (toggle), price (inputs), search (text input).
+    * Drag-and-Drop zone for the builder.
+    * Quantity controls (+/-), Add to Cart, Remove buttons.
+* **Data Containers:** Dynamic population of product lists (`.product-list`), cart items, and builder components.
+* **Event Handling:** Event listeners implemented for `click`, `input`, `submit`, `dragstart`, `drop`, `dragover`, `DOMContentLoaded`.
 
+---
 
+## 3. Lab 3: External Libraries
+*Integration of third-party solutions to enhance code quality.*
 
+A detailed retrospective report can be found here: [📄 LAB3_REPORT.md](./LAB3_REPORT.md)
 
-Lab 2: GUI Requirements (1.2.a.lab2-gui-generic.docx)
-The project fulfills all quantitative and qualitative requirements for the second laboratory assignment on GUI development. It follows the "Implementation of educational projects (independently)" variant on the Web platform.
+**Libraries Used:**
+1.  **`validator` (v13.12.0)**:
+    * Used on the backend for input sanitization (XSS protection) and email validation during order processing.
+2.  **`date-fns` (v4.1.0)**:
+    * Used in the `Order` class for precise delivery date calculations (adding days, date formatting).
 
+---
 
-The application features 6 distinct screens (exceeding the minimum of 4):
+## 4. Academic Project
+*Implementation of unique functionality and domain analysis.*
 
-Home Page (index.html)
+A detailed market and analog analysis can be found here: [📊 ANALYSIS.md](./ANALYSIS.md)
 
-Category Page (products.html)
+**Key Project Features:**
+* **Bouquet Builder:** A unique feature distinguishing this project from typical flower shops. Users can custom-build a bouquet by dragging and dropping flowers (Drag & Drop).
+* **Algorithmic Component (Graph Theory):**
+    * Flowers are represented as **Graph Vertices**, and their compatibility as Edge Weights.
+    * **Kruskal’s Algorithm (MST - Minimum Spanning Tree)** is used to calculate the optimal "Assembly Cost" based on the compatibility of selected components.
+    * This solves the "Black Box Pricing" issue by transparently explaining the composition complexity to the user.
 
-Product Details Page (details.html)
+---
 
-Shopping Cart Page (cart.html)
+## 5. Documentation
+Full technical documentation for the project's classes, methods, and modules has been generated using **JSDoc**.
 
-Bouquet Builder (builder.html)
+It covers all backend entities, product classes, and utility functions.
 
-Checkout Page (checkout.html)
+🔗 **View Full Documentation:**
+[**https://sakharochok.github.io/flower-shop/module-details.html**](https://sakharochok.github.io/flower-shop/module-details.html)
 
-In total, there are over 23 unique control elements (exceeding the minimum of 20). This includes 4 color filter buttons, a seasonal toggle button, a price filter toggle, 2 price range inputs, a search input field, 2 quantity buttons, 3 "Add to Cart" buttons, multiple "Remove from Cart" buttons, drag-and-drop elements, and 5 form controls on the checkout page.
+---
 
-The project features 3 container elements that are dynamically populated with data (exceeding the minimum of 1): the main product list (.product-list), the cart items list (#cart-items-list), and the available components list in the builder (#available-items-list).
+## 🚀 Installation & Setup
 
-There are well over 15 event handlers implemented (exceeding the minimum of 10). The application responds to DOMContentLoaded, click (for all buttons and filters), input (for search and price fields), dragstart, dragover, dragleave, drop (for the bouquet builder), and submit (for the checkout form).
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-username/flower-shop.git](https://github.com/your-username/flower-shop.git)
+    cd flower-shop
+    ```
 
-Finally, the project maintains a strict separation of logic and GUI. The frontend JavaScript files are responsible only for handling user events and rendering data. All business logic,  such as price calculations, bouquet complexity analysis (kruskalMST), and order processing, is handled exclusively by the backend classes and server.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-## Documentation
+3.  **Start the server:**
+    ```bash
+    node backend/server.js
+    ```
 
-The full documentation for the project's classes, methods, and modules, automatically generated by **JSDoc** and deployed via **GitHub Actions**, is available here:
+4.  **Open in browser:**
+    Navigate to `http://localhost:3001`
 
-🔗 [Go to Documentation Page](https://sakharochok.github.io/flower-shop/index.html)
+5.  **Run Tests:**
+    ```bash
+    node tests/oop-tests.js
+    ```
+
+---
+
+## 📂 Project Structure
+
+```text
+FLOWER-SHOP
+├── backend
+│   ├── data
+│   │   ├── entities   # User, Order, Payment, Shipping
+│   │   ├── products   # ShopItem, Flower, Bouquet, SpecialBouquet
+│   │   └── utils      # Graph Algorithms, Store
+│   └── server.js      # Express Server & API Endpoints
+├── frontend
+│   ├── css            # Styles
+│   ├── js             # Client logic (main.js, cart.js, builder.js)
+│   └── *.html         # Pages
+├── tests              # Unit Tests (OOP logic check)
+├── docs               # JSDoc generated documentation
+├── ANALYSIS.md        # Project & Analog Analysis
+├── LAB3_REPORT.md     # External Libraries Report
+└── README.md          # Project Documentation
