@@ -1,11 +1,18 @@
 {
+  "plugins": ["plugins/markdown"],
+  "recurseDepth": 10,
   "source": {
-    "include": ["frontend", "backend"],
-    "exclude": ["node_modules", "tests"]
+    "include": ["backend", "frontend"],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "exclude": ["node_modules", "tests"] 
   },
   "opts": {
-    "destination": "docs",
+    "destination": "./docs",
     "recurse": true,
-    "template": "default"
+    "readme": "README.md"
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
   }
 }

@@ -1,5 +1,8 @@
 // backend/utils/graph.js
-
+/**
+ * Helper class for Disjoint Set Union (DSU) structure used in Kruskal's algorithm.
+ * @class
+ */
 // Helper class for Disjoint Set Union (DSU) used in Kruskal's
 class DSU {
     #parent;
@@ -27,6 +30,11 @@ class DSU {
         return false;
     }
 }
+/**
+ * Main Graph Class.
+ * Implements methods for adding vertices, edges, and finding the Minimum Spanning Tree (MST).
+ * @class
+ */
 
 // --- Main Graph Class ---
 export class Graph {
@@ -43,7 +51,13 @@ export class Graph {
             this.#adjacencyList.set(vertex, []);
         }
     }
-
+    /**
+     * Adds a weighted edge between two vertices.
+     * @param {string} v1 - First vertex name.
+     * @param {string} v2 - Second vertex name.
+     * @param {number} weight - The weight/compatibility score of the edge.
+     * @throws {Error} If one of the vertices is not found.
+     */
     addEdge(v1, v2, weight) {
         if (!this.#adjacencyList.has(v1)) {
             throw new Error(`Vertex ${v1} not found. Cannot add edge.`);
@@ -70,7 +84,11 @@ export class Graph {
     getVertices() {
         return Array.from(this.#adjacencyList.keys());
     }
-
+    /**
+     * Finds the Minimum Spanning Tree (MST) using Kruskal's algorithm.
+     * @method
+     * @returns {Object} Returns { mst: Array, weight: number }.
+     */
     // (FIX) THIS IS THE CORRECT KRUSKAL FUNCTION
     kruskalMST() {
         const sortedEdges = [...this.#edges].sort((a, b) => a.weight - b.weight);
@@ -90,7 +108,12 @@ export class Graph {
         // (FIX) It MUST return both mst and weight
         return { mst, weight: mstWeight };
     }
-
+    /**
+     * Finds the Minimum Spanning Tree (MST) using Prim's algorithm.
+     * @method
+     * @param {string} startVertex - The starting vertex for the traversal.
+     * @returns {Object} Returns { mst: Array, weight: number }.
+     */
     // (This function is also fixed for safety)
     primMST(startVertex) {
         const vertices = this.getVertices();

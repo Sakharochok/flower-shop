@@ -1,3 +1,7 @@
+/**
+ * Main module for displaying products on the home page and applying filters.
+ * @module main
+ */
 import { updateCartCount } from './cart.js';
 
 // DOM Elements
@@ -26,7 +30,9 @@ let currentFilters = {
 
 
 /**
- * (CORE LOGIC) Applies all current filters to the full bouquet list and re-renders.
+ * (CORE LOGIC) Applies all current filters (color, season, price, search) 
+ * to the bouquet list and re-renders the display.
+ * @function
  */
 function applyFilters() {
     let filteredBouquets = allBouquets;
@@ -66,7 +72,8 @@ function applyFilters() {
 
 
 /**
- * Renders the list of bouquets into the container.
+ * Renders the list of filtered bouquets into the container.
+ * @function
  * @param {Array<object>} bouquetsToRender - Array of bouquets to display.
  */
 function renderProductList(bouquetsToRender) {
@@ -99,7 +106,10 @@ function renderProductCard(product) {
 
 
 /**
- * Fetches products from the API, initializes `allBouquets`, and applies initial filters.
+ * Fetches products from the API, initializes the list, and applies initial filters.
+ * @async
+ * @function
+ * @throws {Error} If fetching from API fails.
  */
 async function fetchAndInitialize() {
     if (!productListContainer) return;

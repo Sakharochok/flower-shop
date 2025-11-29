@@ -1,21 +1,22 @@
 // backend/utils/compatibilityGraph.js
 
 import { Graph } from './graph.js';
-// (FIX) Ми ПРИБРАЛИ звідси імпорт 'products'.
+
 
 /**
- * (FIX) Створює та експортує граф сумісності
- * Тепер він ПРИЙМАЄ 'products' як аргумент.
+ * Factory function that creates and populates the master graph of flower compatibility.
+ * @function
+ * @param {Array<Object>} products - Array of all shop products (used to get vertex names).
+ * @returns {Graph} The fully initialized Graph instance.
  */
 export function createMasterGraph(products) {
     const masterGraph = new Graph();
 
-    // 1. Додаємо ВСІ продукти (включно з букетами) як вершини
+   
     for (const product of products) {
         masterGraph.addVertex(product.getName());
     }
 
-    // 2. Визначаємо нові правила сумісності (ребра)
     // --- Roses ---
     masterGraph.addEdge('Pink Rose (builder)', 'White Rose (builder)', 3);
     masterGraph.addEdge('Red Rose (builder)', 'White Rose (builder)', 3);

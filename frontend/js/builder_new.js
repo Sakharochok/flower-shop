@@ -1,3 +1,8 @@
+/**
+ * Module for the Bouquet Builder.
+ * Handles drag-and-drop, graph calculation, and adding the custom bouquet to the cart.
+ * @module builder_new
+ */
 import { updateCartCount, addToCart } from './cart.js';
 
 let lastCalculatedBouquetPrice = 0;
@@ -14,6 +19,12 @@ let allComponents = [];
 let currentBouquetItems = []; 
 let dropCounter = 0;
 
+/**
+ * Fetches the available flower components from the API.
+ * @async
+ * @function
+ * @throws {Error} If fetching components fails.
+ */
 async function fetchComponents() {
     if (!availableItemsList) return;
 
@@ -66,7 +77,11 @@ function handleDragOver(e) {
 function handleDragLeave(e) {
     dropZone.classList.remove('drag-over');
 }
-
+/**
+ * Handles the drop event, adds the flower to the bouquet, and updates the display.
+ * @function
+ * @param {DragEvent} e - The drag event.
+ */
 function handleDrop(e) {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
@@ -124,6 +139,12 @@ function handleDeleteItem(e) {
     }
 }
 
+/**
+ * Calculates the assembly cost of the current bouquet by making a POST request to the API.
+ * @async
+ * @function
+ * @throws {Error} If the bouquet has less than two components or the API call fails.
+ */
 async function handleCalculateClick() {
     if (currentBouquetItems.length < 2) return;
 
