@@ -52,13 +52,13 @@ package "Products Module" {
     }
 }
 
-' Зв'язки наслідування (Inheritance)
+' Inheritance Relationships
 ShopItem <|-- Flower
 ShopItem <|-- DecorItem
 ShopItem <|-- Bouquet
 Bouquet <|-- SpecialBouquet
 
-' Зв'язки агрегації (Aggregation)
+' Aggregation Relationships
 Store o-- ShopItem : "contains >"
 Bouquet o-- Flower : "consists of >"
 

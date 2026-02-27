@@ -185,6 +185,19 @@ app.get(['/', '/index.html'], (req, res) => {
 });
 // ... (other static routes: /cart.html, /details.html, /checkout.html, etc.)
 
+/**
+ * GET /api/components
+ * Returns a list of individual flowers available for the bouquet builder.
+ */
+app.get('/api/components', (req, res) => {
+    // Фільтруємо лише квіти (Flower), виключаючи готові букети
+    const components = products
+        .filter(p => typeof p.isSuitableForTallVase === 'function') // Перевірка, що це саме квітка
+        .map(hydrateProduct); // Перетворюємо у простий JSON формат
+    
+    res.json(components);
+});
+
 app.listen(PORT, () => {
     console.log(`Server running. Frontend accessible at http://localhost:${PORT}`);
 });

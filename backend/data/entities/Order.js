@@ -75,4 +75,17 @@ export class Order {
         }
         return false;
     }
+
+    setShippingStrategy(strategy) {
+        this.shippingStrategy = strategy;
+    }
+
+    getShippingCost() {
+    if (!this.shippingStrategy) return 0;
+        return this.shippingStrategy.calculate(this.customer.getShippingAddress());
+    }
+
+    calculateTotalWithShipping() {
+        return this.calculateTotal() + this.getShippingCost();
+    }
 }

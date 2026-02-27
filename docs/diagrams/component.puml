@@ -2,19 +2,19 @@
 skinparam style strictuml
 skinparam monochrome true
 
-package "Квітковий магазин (Flower Shop)" {
+package "Flower Shop System" {
     component "Frontend UI\n(HTML, CSS)" as UI
-    component "Клієнтська логіка\n(cart.js, builder.js)" as ClientLogic
+    component "Client Logic\n(cart.js, builder.js)" as ClientLogic
     
-    package "Бекенд (Node.js)" {
+    package "Backend (Node.js)" {
         component "Express REST API\n(server.js)" as API
-        component "Бізнес-сутності\n(Order, Bouquet, etc.)" as Models
-        component "Алгоритми\n(graph.js)" as Utils
+        component "Business Entities\n(Order, Bouquet, etc.)" as Models
+        component "Algorithms\n(graph.js)" as Utils
     }
 }
 
-UI --> ClientLogic : "Взаємодія користувача"
-ClientLogic --> API : "HTTP fetch запити"
-API --> Models : "Створює об'єкти"
-API --> Utils : "Рахує MST"
+UI --> ClientLogic : "User Interaction"
+ClientLogic --> API : "HTTP fetch requests"
+API --> Models : "Creates Objects"
+API --> Utils : "Calculates MST"
 @enduml

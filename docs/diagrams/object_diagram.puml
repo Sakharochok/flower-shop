@@ -1,0 +1,39 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+title Object Diagram (Snapshot: Order #101)
+
+object "user1: User" as u1 {
+  id = 1
+  name = "Sofiia"
+  email = "sofiia@example.com"
+}
+
+object "rose: Flower" as f1 {
+  name = "Red Rose"
+  price = 65
+  color = "Red"
+}
+
+object "tulip: Flower" as f2 {
+  name = "White Tulip"
+  price = 38
+  color = "White"
+}
+
+object "order101: Order" as o1 {
+  id = 101
+  status = "Pending"
+  totalAmount = 103
+  createdAt = "2026-02-27"
+}
+
+object "delivery: NovaPoshtaStrategy" as d1 {
+  cost = 80
+}
+
+o1 --> u1 : customer
+o1 o-- f1 : items
+o1 o-- f2 : items
+o1 --> d1 : shippingStrategy
+@enduml

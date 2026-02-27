@@ -1,0 +1,22 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+title Order Lifecycle (State Machine)
+
+[*] --> Pending : Created (new Order)
+
+state Pending {
+    ' Standard UML syntax for internal actions
+    Pending : entry / Validate Data
+    Pending : do / Calculate Cost
+}
+
+Pending --> Paid : Payment Successful
+Pending --> Cancelled : Payment Failed / Cancelled
+
+Paid --> Shipped : Handed to Delivery
+Shipped --> Delivered : Customer Received
+
+Delivered --> [*]
+Cancelled --> [*]
+@enduml
