@@ -1,0 +1,20 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+
+package "Квітковий магазин (Flower Shop)" {
+    component "Frontend UI\n(HTML, CSS)" as UI
+    component "Клієнтська логіка\n(cart.js, builder.js)" as ClientLogic
+    
+    package "Бекенд (Node.js)" {
+        component "Express REST API\n(server.js)" as API
+        component "Бізнес-сутності\n(Order, Bouquet, etc.)" as Models
+        component "Алгоритми\n(graph.js)" as Utils
+    }
+}
+
+UI --> ClientLogic : "Взаємодія користувача"
+ClientLogic --> API : "HTTP fetch запити"
+API --> Models : "Створює об'єкти"
+API --> Utils : "Рахує MST"
+@enduml

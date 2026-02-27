@@ -1,0 +1,30 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+
+title Алгоритм: Розрахунок вартості збірки букета (MST)
+
+start
+:Отримати масив імен квітів у букеті;
+
+if (Кількість квітів < 2?) then (Так)
+  :Повернути порожній результат\n{ mst: [], weight: 0 };
+  stop
+else (Ні)
+  :Створити порожній граф (subGraph);
+  
+  :Додати вибрані квіти\nяк вершини (vertices);
+  
+  :Відфільтрувати та додати\nвідповідні ребра (edges) з masterGraph;
+  
+  if (Вибраний алгоритм == 'Prim'?) then (Так)
+    :Виконати алгоритм Прима\n(subGraph.primMST);
+  else (Ні, за замовчуванням Kruskal)
+    :Виконати алгоритм Краскала\n(subGraph.kruskalMST);
+  endif
+  
+  :Повернути оптимальні з'єднання (mst)\nта загальну вартість збірки (weight);
+  stop
+endif
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+skinparam style strictuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam monochrome true
+
+actor "Покупець (Customer)" as Customer
+actor "Бекенд (Express Server)" as System
+
+rectangle "Web-додаток Flower Shop" {
+  usecase "Перегляд каталогу" as UC_Catalog
+  usecase "Фільтрація та пошук" as UC_Filter
+  usecase "Збірка кастомного букета" as UC_Builder
+  usecase "Управління кошиком" as UC_Cart
+  usecase "Оформлення замовлення" as UC_Checkout
+  usecase "Обробка оплати" as UC_Payment
+  usecase "Розрахунок вартості графом (MST)" as UC_Calc
+}
+
+' Дії користувача
+Customer --> UC_Catalog
+Customer --> UC_Builder
+Customer --> UC_Cart
+Customer --> UC_Checkout
+
+' Розширення та включення (дуже важливо для UML)
+UC_Catalog <.. UC_Filter : <<extend>>
+UC_Builder ..> UC_Calc : <<include>>
+UC_Checkout ..> UC_Payment : <<include>>
+
+' Дії системи (сервера)
+UC_Calc <-- System
+UC_Payment <-- System
+
+@enduml
