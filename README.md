@@ -8,12 +8,12 @@ The project combines classic e-commerce functionality, strict object-oriented ar
 
 ## 📋 Table of Contents
 1. [Lab 1: OOP Basics](#1-lab-1-oop-basics)
-2. [Lab 2: Graphical User Interface (GUI)](#2-lab-2-graphical-user-interface-gui)
-3. [Lab 3: External Libraries](#3-lab-3-external-libraries)
-4. [Academic Project](#4-academic-project)
-5. [Documentation](#5-documentation)
-6. [Installation & Setup](#-installation--setup)
-7. [Project Structure](#-project-structure)
+2. [Lab 1a: Refactoring & UML](#1a-lab-1a-refactoring--uml-modeling) 3. [Lab 2: Graphical User Interface (GUI)](#2-lab-2-graphical-user-interface-gui)
+4. [Lab 3: External Libraries](#3-lab-3-external-libraries)
+5. [Academic Project](#4-academic-project)
+6. [Documentation](#5-documentation)
+7. [Installation & Setup](#-installation--setup)
+8. [Project Structure](#-project-structure)
 
 ---
 
@@ -32,14 +32,29 @@ The project implements a strict OOP architecture:
     2.  `Bouquet` → `SpecialBouquet` (Deep hierarchy, 3 levels).
     3.  `Shipping` (Abstract) → `NovaPoshtaShipping`.
 * **Polymorphism:**
-    * **Dynamic:** The `getDescription()` method is overridden in `Flower`, `DecorItem`, and `SpecialBouquet` classes. The `calculateCost()` method is overridden in `NovaPoshtaShipping`.
-    * **Static (Generics Simulation):** The `Store` class implements a container that accepts only objects inheriting from `ShopItem` (using `instanceof` checks).
+    * **Dynamic:** The `getDescription()` method is overridden in `Flower`, `DecorItem`, and `SpecialBouquet` classes.
+    * **Static (Generics Simulation):** The `Store` class implements a container that accepts only objects inheriting from `ShopItem`.
 * **Non-trivial Methods:** Over 25 complex methods implemented, including `findOptimalFlowerConnections` (graph algorithm), `processPayment`, and `updateStatus`.
 
 ---
 
+## 1a. Lab 1a: Refactoring & UML Modeling
+*Advanced system modeling and architectural improvements.*
+
+**1. Refactoring (Strategy Pattern)**
+* **Problem:** The `Order` class had high coupling with specific shipping logic (`NovaPoshtaShipping`), violating the Open/Closed Principle.
+* **Solution:** Implemented the **Strategy Pattern**. Shipping logic was encapsulated into separate strategy classes (`NovaPoshtaStrategy`, `PickupStrategy`) implementing a common interface.
+* **Result:** New delivery methods can be added without modifying the core `Order` logic.
+
+**2. UML Modeling**
+A complete set of **8 UML diagrams** was created to document the system:
+* **Static Structure:** Class Diagram, Component Diagram, Deployment Diagram, Object Diagram.
+* **Dynamic Behavior:** Use Case Diagram, Sequence Diagram, Activity Diagram, State Machine Diagram.
+
+---
+
 ## 2. Lab 2: Graphical User Interface (GUI)
-[cite_start]*Implementation of interactive user interaction [cite: 98-101].*
+*Implementation of interactive user interaction.*
 
 The interface is decoupled from business logic (Frontend in `frontend/`, Backend in `backend/`).
 
@@ -130,7 +145,7 @@ It covers all backend entities, product classes, and utility functions.
 FLOWER-SHOP
 ├── backend
 │   ├── data
-│   │   ├── entities   # User, Order, Payment, Shipping
+│   │   ├── entities   # User, Order, Payment, Shipping (Strategy)
 │   │   ├── products   # ShopItem, Flower, Bouquet, SpecialBouquet
 │   │   └── utils      # Graph Algorithms, Store
 │   └── server.js      # Express Server & API Endpoints
@@ -139,7 +154,8 @@ FLOWER-SHOP
 │   ├── js             # Client logic (main.js, cart.js, builder.js)
 │   └── *.html         # Pages
 ├── tests              # Unit Tests (OOP logic check)
-├── docs               # JSDoc generated documentation
+├── docs               # Project Documentation
+│   └── diagrams       # UML Diagrams (PlantUML/Images)
 ├── ANALYSIS.md        # Project & Analog Analysis
 ├── LAB3_REPORT.md     # External Libraries Report
 └── README.md          # Project Documentation

@@ -1,9 +1,8 @@
-// backend/data/entities/Order.js
-
-import { addDays, format } from 'date-fns'; // [NEW] External library for Lab 3
+import { addDays, format } from 'date-fns';
 
 /**
  * Class representing a customer order.
+ * Implements the **Strategy Pattern** for shipping cost calculation.
  * @class
  * @name Order
  */
@@ -12,7 +11,7 @@ export class Order {
     #customer;
     #items;
     #status;
-    #creationDate; // [NEW] Stores when the order was created
+    #creationDate; 
 
     /**
      * Creates an Order instance.
@@ -76,6 +75,12 @@ export class Order {
         return false;
     }
 
+    /**
+     * Sets the shipping strategy dynamically.
+     * @param {Object} strategy - A concrete implementation of the ShippingStrategy interface.
+     * @example
+     * order.setShippingStrategy(new NovaPoshtaStrategy());
+     */
     setShippingStrategy(strategy) {
         this.shippingStrategy = strategy;
     }
@@ -85,6 +90,11 @@ export class Order {
         return this.shippingStrategy.calculate(this.customer.getShippingAddress());
     }
 
+    /**
+     * Calculates the total cost including shipping.
+     * Uses the currently selected shipping strategy.
+     * @returns {number} The final total price.
+     */
     calculateTotalWithShipping() {
         return this.calculateTotal() + this.getShippingCost();
     }
