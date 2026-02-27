@@ -1,0 +1,49 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+
+actor "Покупець" as User
+participant "Фронтенд\n(checkout.js)" as Client
+participant "Кошик\n(Cart Class)" as Cart
+participant "Бекенд\n(server.js)" as Server
+participant "Сутності\n(Order, User)" as Entities
+
+User -> Client : Натискає "Confirm Order"
+activate Client
+
+Client -> Cart : getTotalItemsCount()
+activate Cart
+Cart --> Client : count
+deactivate Cart
+
+alt Якщо кошик порожній (count == 0)
+    Client --> User : Відобразити помилку "Your cart is empty"
+else Кошик не порожній
+    Client -> Server : POST запит з formData
+    activate Server
+    
+    Server -> Server : Валідація даних (validator.js)
+    
+    Server -> Entities : Створення об'єктів Order, User, Payment
+    activate Entities
+    Entities --> Server : Об'єкти створено
+    deactivate Entities
+    
+    Server -> Entities : getEstimatedDeliveryDate() (через date-fns)
+    activate Entities
+    Entities --> Server : Дата доставки
+    deactivate Entities
+    
+    Server --> Client : 200 OK (orderId, totalPaid, estimatedDelivery)
+    deactivate Server
+    
+    Client -> Cart : clearCart() (або видалення з localStorage)
+    activate Cart
+    Cart --> Client : Кошик очищено
+    deactivate Cart
+    
+    Client --> User : Повідомлення про успіх + Дата доставки
+end
+
+deactivate Client
+@enduml

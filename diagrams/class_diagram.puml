@@ -1,0 +1,65 @@
+@startuml
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+package "Products Module" {
+    abstract class ShopItem {
+        - id: number
+        - name: string
+        - price: number
+        - image: string
+        + getId(): number
+        + getName(): string
+        + getPrice(): number
+        + getDescription(): string <<virtual>>
+        + isPricy(): boolean
+    }
+
+    class Flower {
+        - color: string
+        - stemLength: number
+        + isSuitableForTallVase(): boolean
+        + getDescription(): string <<override>>
+    }
+
+    class DecorItem {
+        - material: string
+        + getDescription(): string <<override>>
+    }
+
+    class Bouquet {
+        - flowers: Array<Flower>
+        - isCustom: boolean
+        - mainColor: string
+        - season: string
+        + addFlower(flower: Flower): void
+        + findOptimalFlowerConnections(): Object
+        + getDescription(): string <<override>>
+    }
+
+    class SpecialBouquet {
+        - occasion: string
+        + getOccasion(): string
+        + getDescription(): string <<override>>
+    }
+
+    class Store {
+        - items: Array<ShopItem>
+        + addItem(item: ShopItem): void
+        + getTotalItemsCount(): number
+        + clearItems(): number
+    }
+}
+
+' Зв'язки наслідування (Inheritance)
+ShopItem <|-- Flower
+ShopItem <|-- DecorItem
+ShopItem <|-- Bouquet
+Bouquet <|-- SpecialBouquet
+
+' Зв'язки агрегації (Aggregation)
+Store o-- ShopItem : "contains >"
+Bouquet o-- Flower : "consists of >"
+
+@enduml
