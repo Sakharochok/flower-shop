@@ -2,29 +2,19 @@
 skinparam style strictuml
 skinparam monochrome true
 
-title Алгоритм: Розрахунок вартості збірки букета (MST)
+package "Flower Shop System" {
+    component "Frontend UI\n(HTML, CSS)" as UI
+    component "Client Logic\n(cart.js, builder.js)" as ClientLogic
+    
+    package "Backend (Node.js)" {
+        component "Express REST API\n(server.js)" as API
+        component "Business Entities\n(Order, Bouquet, etc.)" as Models
+        component "Algorithms\n(graph.js)" as Utils
+    }
+}
 
-start
-:Отримати масив імен квітів у букеті;
-
-if (Кількість квітів < 2?) then (Так)
-  :Повернути порожній результат\n{ mst: [], weight: 0 };
-  stop
-else (Ні)
-  :Створити порожній граф (subGraph);
-  
-  :Додати вибрані квіти\nяк вершини (vertices);
-  
-  :Відфільтрувати та додати\nвідповідні ребра (edges) з masterGraph;
-  
-  if (Вибраний алгоритм == 'Prim'?) then (Так)
-    :Виконати алгоритм Прима\n(subGraph.primMST);
-  else (Ні, за замовчуванням Kruskal)
-    :Виконати алгоритм Краскала\n(subGraph.kruskalMST);
-  endif
-  
-  :Повернути оптимальні з'єднання (mst)\nта загальну вартість збірки (weight);
-  stop
-endif
-
+UI --> ClientLogic : "User Interaction"
+ClientLogic --> API : "HTTP fetch requests"
+API --> Models : "Creates Objects"
+API --> Utils : "Calculates MST"
 @enduml

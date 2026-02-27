@@ -1,0 +1,25 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+title Deployment Diagram - Flower Shop
+
+node "Client Device" as ClientNode {
+    component "Web Browser" as Browser {
+        artifact "Frontend HTML/CSS/JS" as FE
+    }
+}
+
+node "Application Server" as ServerNode {
+    component "Node.js Environment" as Node {
+        artifact "Express Server (server.js)" as API
+        artifact "Business Logic (Entities)" as BL
+    }
+    database "File System" as FS {
+        file "Products.js" as Data
+    }
+}
+
+Browser -- ServerNode : HTTPS / REST API\n(JSON)
+API ..> BL : Uses
+BL ..> Data : Reads Data
+@enduml

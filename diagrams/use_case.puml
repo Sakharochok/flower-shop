@@ -4,31 +4,31 @@ left to right direction
 skinparam packageStyle rectangle
 skinparam monochrome true
 
-actor "Покупець (Customer)" as Customer
-actor "Бекенд (Express Server)" as System
+actor "Customer" as Customer
+actor "Backend (Express Server)" as System
 
-rectangle "Web-додаток Flower Shop" {
-  usecase "Перегляд каталогу" as UC_Catalog
-  usecase "Фільтрація та пошук" as UC_Filter
-  usecase "Збірка кастомного букета" as UC_Builder
-  usecase "Управління кошиком" as UC_Cart
-  usecase "Оформлення замовлення" as UC_Checkout
-  usecase "Обробка оплати" as UC_Payment
-  usecase "Розрахунок вартості графом (MST)" as UC_Calc
+rectangle "Flower Shop Web App" {
+  usecase "View Catalog" as UC_Catalog
+  usecase "Filter & Search" as UC_Filter
+  usecase "Build Custom Bouquet" as UC_Builder
+  usecase "Manage Cart" as UC_Cart
+  usecase "Checkout" as UC_Checkout
+  usecase "Process Payment" as UC_Payment
+  usecase "Calculate Assembly Cost (MST)" as UC_Calc
 }
 
-' Дії користувача
+' User Actions
 Customer --> UC_Catalog
 Customer --> UC_Builder
 Customer --> UC_Cart
 Customer --> UC_Checkout
 
-' Розширення та включення (дуже важливо для UML)
+' Extensions and Includes
 UC_Catalog <.. UC_Filter : <<extend>>
 UC_Builder ..> UC_Calc : <<include>>
 UC_Checkout ..> UC_Payment : <<include>>
 
-' Дії системи (сервера)
+' System Actions
 UC_Calc <-- System
 UC_Payment <-- System
 
